@@ -7,11 +7,20 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import SignUp from "layouts/authentication/sign-up";
+import Course from "layouts/course";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
 
 const routes = [
+  {
+    type: "collapse",
+    name: "Courses",
+    key: "courses",
+    icon: <Icon fontSize="small">school</Icon>,
+    route: "/courses",
+    component: <Course />,
+  },
   {
     type: "collapse",
     name: "Dashboard",
