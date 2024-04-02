@@ -4,7 +4,7 @@ import Tables from "layouts/tables";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
-import Course from "layouts/course";
+import Course from "layouts/courses";
 
 // @mui icons
 import Icon from "@mui/material/Icon";
