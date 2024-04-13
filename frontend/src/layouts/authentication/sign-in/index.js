@@ -130,6 +130,7 @@ function Basic() {
     </BasicLayout>
   );
 }
+<<<<<<< HEAD
 import config from '../../../config.js';
 
 // Handle user login
@@ -158,5 +159,7 @@ app.post('/login', (req, res) => {
   });
 });
 
+=======
+>>>>>>> d818063a68998bc908e8e3d5dc1898d992b6d128
 
 export default Basic;
