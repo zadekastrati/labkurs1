@@ -130,7 +130,7 @@ function Basic() {
     </BasicLayout>
   );
 }
-import config from 'frontend/config.js';
+import config from '../../../config.js';
 
 // Handle user login
 app.post('/login', (req, res) => {
