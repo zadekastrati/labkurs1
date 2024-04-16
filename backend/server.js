@@ -11,5 +11,6 @@ app.use(cors());
 
 app.get("/", (req, res) => res.send("Hello from express!"));
 
-app.listen(port, () => console.log(`Server is listening on port: http://localhost:${port}`));
-
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
