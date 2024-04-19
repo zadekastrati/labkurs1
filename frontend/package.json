@@ -1,5 +1,5 @@
 {
-  "name": "material-dashboard-2-react",
+  "name": "coders-academy",
   "version": "2.2.0",
   "private": true,
   "author": "LabKurs1",
@@ -17,7 +17,6 @@
     "bootstrap": "^5.3.3",
     "chart.js": "4.3.0",
     "chroma-js": "2.4.2",
-    "mysql": "^2.18.1",
     "prop-types": "15.8.1",
     "react": "18.2.0",
     "react-chartjs-2": "5.2.0",
