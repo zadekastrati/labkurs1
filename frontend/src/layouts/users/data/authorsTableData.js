@@ -10,7 +10,7 @@ import team3 from "assets/images/team-3.jpg";
 import team4 from "assets/images/team-4.jpg";
 
 export default function data() {
-  const Author = ({ image, name, email }) => (
+  const Author = ({name, email }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       {/* <MDAvatar src={image} name={name} size="sm" /> */}
       <MDBox lineHeight={1}>
@@ -30,10 +30,10 @@ export default function data() {
     ],
     rows: [
       {
-        user: <Author image={team2} name="John Michael" email="john@creative-tim.com" />,
+        user: <Author name="John Michael" email="john@creative-tim.com" />,
         role: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="professor" color="success" variant="gradient" size="sm" />
+            <MDBadge badgeContent="trainer" color="success" variant="gradient" size="sm" />
           </MDBox>
         ),
         action:
