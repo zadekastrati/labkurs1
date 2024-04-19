@@ -10,7 +10,7 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/profile/DataTable";
+import DataTable from "layouts/users/DataTable";
 
 // Data
 import authorsTableData from "layouts/users/data/authorsTableData";

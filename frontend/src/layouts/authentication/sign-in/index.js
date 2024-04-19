@@ -41,6 +41,9 @@ import BasicLayout from "layouts/authentication/components/BasicLayout";
 // Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
+//functionality
+// import login from "../../../../backend/authentication";
+
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
 

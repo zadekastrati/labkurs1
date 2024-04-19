@@ -80,7 +80,7 @@ function Tables() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  My Courses
+                  My Coursesnnp
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>

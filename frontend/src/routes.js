@@ -1,6 +1,7 @@
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
-import Tables from "layouts/tables";
+import Users from "layouts/users";
+import Trainers from "layouts/trainers";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
@@ -21,29 +22,28 @@ const routes = [
   },  
   {
     type: "collapse",
+    name: "Users",
+    key: "users",
+    icon: <Icon fontSize="small">persons</Icon>,
+    route: "/users",
+    component: <Users />,
+  },
+  {
+    type: "collapse",
+    name: "Trainers",
+    key: "trainers",
+    icon: <Icon fontSize="small">book</Icon>,
+    route: "/trainers",
+    component: <Trainers />,
+  },
+  {
+    type: "collapse",
     name: "Courses",
     key: "courses",
     icon: <Icon fontSize="small">school</Icon>,
     route: "/courses",
     component: <Course />,
-  },
-  {
-    type: "collapse",
-    name: "Tables",
-    key: "tables",
-    icon: <Icon fontSize="small">table_view</Icon>,
-    route: "/tables",
-    component: <Tables />,
-  },
-
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
-  },
+  }, 
   {
     type: "collapse",
     name: "Profile",
@@ -52,6 +52,15 @@ const routes = [
     route: "/profile",
     component: <Profile />,
   },
+  {
+    type: "collapse",
+    name: "Notifications",
+    key: "notifications",
+    icon: <Icon fontSize="small">notifications</Icon>,
+    route: "/notifications",
+    component: <Notifications />,
+  },
+ 
   {
     type: "collapse",
     name: "Sign In",
