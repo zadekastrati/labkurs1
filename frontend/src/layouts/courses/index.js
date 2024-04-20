@@ -55,6 +55,6 @@ function courses() {
       <Footer />
     </DashboardLayout>
   );
-}
+};
 
 export default courses;
