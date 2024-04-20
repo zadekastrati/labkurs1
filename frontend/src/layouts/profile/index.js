@@ -15,7 +15,7 @@ import DataTable from "layouts/profile/DataTable";
 // Data
 import authorsTableData from "layouts/users/data/authorsTableData";
 
-function Users() {
+function MyCourses() {
   const { columns, rows } = authorsTableData();
 
   return (
@@ -36,7 +36,7 @@ function Users() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Users
+                  MyCourses
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -57,4 +57,4 @@ function Users() {
   );
 }
 
-export default Users;
+export default MyCourses;

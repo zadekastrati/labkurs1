@@ -1,11 +1,11 @@
-const Student = require('../models/students.model.js');
+const Student = require('../models/student.model.js');
 
 // Create a new student
 async function createStudent(req, res) {
   try {
-    const { name, email, age, grade } = req.body;
+    const { name, email, courses, grade } = req.body;
 
-    const student = await Student.create({ name, email, age, grade });
+    const student = await Student.create({ name, email, courses, grade });
 
     res.status(201).json(student);
   } catch (err) {
