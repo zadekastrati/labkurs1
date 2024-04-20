@@ -1,56 +1,56 @@
-const Student = require('../models/students.model.js');
+const User = require('../models/user.model.js');
 
-// Create a new student
-async function createStudent(req, res) {
+// Create a new user
+async function createUser(req, res) {
   try {
-    const { name, email, age, grade } = req.body;
+    const { name, email, role, password } = req.body;
 
-    const student = await Student.create({ name, email, age, grade });
+    const user = await User.create({ name, email, role, password });
 
-    res.status(201).json(student);
+    res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
-exports.createStudent = createStudent;
+exports.createUser = createUser;
 
-// Retrieve all students
-async function getAllStudents(req, res) {
+// Retrieve all users
+async function getAllUsers(req, res) {
   try {
-    const students = await Student.findAll();
-    res.status(200).json(students);
+    const users = await User.findAll();
+    res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 }
-exports.getAllStudents = getAllStudents;
+exports.getAllUsers = getAllUsers;
 
-// Retrieve a single student by id
-async function getStudentById(req, res) {
+// Retrieve a single user by id
+async function getUserById(req, res) {
   const id = req.params.id;
   try {
-    const student = await Student.findByPk(id);
-    if (!student) {
-      res.status(404).json({ message: `Student with id ${id} not found` });
+    const user = await User.findByPk(id);
+    if (!user) {
+      res.status(404).json({ message: `User with id ${id} not found` });
     } else {
-      res.status(200).json(student);
+      res.status(200).json(user);
     }
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 }
-exports.getStudentById = getStudentById;
+exports.getUserById = getUserById;
 
-// Update a student by id
-async function updateStudent(req, res) {
+// Update a user by id
+async function updateUser(req, res) {
   const id = req.params.id;
   try {
-    const [updatedRowsCount, updatedRows] = await Student.update(req.body, {
+    const [updatedRowsCount, updatedRows] = await User.update(req.body, {
       where: { id },
       returning: true,
     });
     if (updatedRowsCount === 0) {
-      res.status(404).json({ message: `Student with id ${id} not found` });
+      res.status(404).json({ message: `User with id ${id} not found` });
     } else {
       res.status(200).json(updatedRows[0]);
     }
@@ -58,15 +58,15 @@ async function updateStudent(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
-exports.updateStudent = updateStudent;
+exports.updateUser = updateUser;
 
-// Delete a student by id
-async function deleteStudent(req, res) {
+// Delete a user by id
+async function deleteUser(req, res) {
   const id = req.params.id;
   try {
-    const deletedRowCount = await Student.destroy({ where: { id } });
+    const deletedRowCount = await User.destroy({ where: { id } });
     if (deletedRowCount === 0) {
-      res.status(404).json({ message: `Student with id ${id} not found` });
+      res.status(404).json({ message: `User with id ${id} not found` });
     } else {
       res.status(204).send();
     }
@@ -74,4 +74,4 @@ async function deleteStudent(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
-exports.deleteStudent = deleteStudent;
+exports.deleteUser = deleteUser;
