@@ -1,30 +1,83 @@
-// @mui material components
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
-import Button from '@mui/material/Button';
-
-// Material Dashboard 2 React components
+import Button from "@mui/material/Button";
 import MDBox from "components/MDBox";
+import MDBadge from "@mui/material/Badge";
 import MDTypography from "components/MDTypography";
-
-// Material Dashboard 2 React example components
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/users/DataTable";
 
-// Data
-import authorsTableData from "layouts/users/data/authorsTableData";
-
 function Users() {
-  const { columns, rows } = authorsTableData();
+  const [userData, setUserData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:8080/api/users")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log("Fetched data:", data);
+        const formattedData = data.map((item) => ({
+          user: (
+            <Author name={item.name} email={item.email} />
+          ),
+          role: (
+            <MDBox ml={-1}>
+              <MDBadge badgeContent={item.role} color="success" variant="gradient" size="sm" />
+            </MDBox>
+          ),
+          action: (
+            <MDBox display="flex" alignItems="center">
+              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+                Edit
+              </MDTypography>
+              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }}>
+                Delete
+              </MDTypography>
+            </MDBox>
+          ),
+        }));
+        setUserData(formattedData);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError(error);
+        setIsLoading(false);
+      });
+  }, []);
+
+  const Author = ({ name, email }) => (
+    <MDBox display="flex" alignItems="center" lineHeight={1}>
+      <MDBox lineHeight={1}>
+        <MDTypography display="block" variant="button" fontWeight="medium">
+          {name}
+        </MDTypography>
+        <MDTypography variant="caption">{email}</MDTypography>
+      </MDBox>
+    </MDBox>
+  );
+
+  const columns = [
+    { Header: "User", accessor: "user", width: "45%", align: "left" },
+    { Header: "Role", accessor: "role", align: "left" },
+    { Header: "Action", accessor: "action", align: "center" }
+  ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
       <Button component="a" href="CreateUserModal" variant="contained" color="white" sx={{ ml: 2 }}>
-    Create
-</Button>
+        Create
+      </Button>
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -44,13 +97,19 @@ function Users() {
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
-                <DataTable
-                  table={{ columns, rows }}
-                  isSorted={false}
-                  entriesPerPage={false}
-                  showTotalEntries={false}
-                  noEndBorder
-                />
+                {isLoading ? (
+                  <MDTypography>Loading...</MDTypography>
+                ) : error ? (
+                  <MDTypography>Error: {error.message}</MDTypography>
+                ) : (
+                  <DataTable
+                    table={{ columns, rows: userData }}
+                    isSorted={false}
+                    entriesPerPage={false}
+                    showTotalEntries={false}
+                    noEndBorder
+                  />
+                )}
               </MDBox>
             </Card>
           </Grid>
