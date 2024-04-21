@@ -1,8 +1,10 @@
 const express = require("express");
 const db = require("./config/db.config.js");
+const cors = require('cors');
 const userRoutes = require("./routes/user.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
 const trainerRoutes = require("./routes/trainer.routes.js");
+const studentCoursesRoutes = require("./routes/student_course.routes.js");
 
 // Initialize Express app
 const app = express();
@@ -14,6 +16,8 @@ app.use(express.json());
 // Parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cors());
+
 // Connect to database
 db.authenticate()
   .then(() => console.log("Database connected"))
@@ -23,7 +27,7 @@ db.authenticate()
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/trainers", trainerRoutes);
-app.use("/api/student", studentCourseRoutes);
+app.use("/api/student", studentCoursesRoutes);
 
 // app.get("/data", (req, res) => {
 //   db.query("SELECT * FROM students", (error, results) => {
