@@ -1,6 +1,7 @@
 // @mui material components
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
+import Button from '@mui/material/Button';
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -21,6 +22,9 @@ function Users() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <Button component="a" href="CreateUserModal" variant="contained" color="white" sx={{ ml: 2 }}>
+    Create
+</Button>
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
