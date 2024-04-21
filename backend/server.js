@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("./config/db.config.js");
 const userRoutes = require("./routes/user.routes.js");
+const courseRoutes = require("./routes/course.routes.js");
 
 // Initialize Express app
 const app = express();
@@ -19,6 +20,7 @@ db.authenticate()
 
 // Define routes
 app.use("/api/users", userRoutes);
+app.use("/api/courses", courseRoutes);
 
 app.get("/data", (req, res) => {
   db.query("SELECT * FROM students", (error, results) => {

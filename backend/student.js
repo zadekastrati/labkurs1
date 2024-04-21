@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAllStudents } from "./backend/students.js";
+import { getAllStudents } from "./backend/student.js";
 
 const router = express.Router();
 
