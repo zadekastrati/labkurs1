@@ -1,7 +1,11 @@
 const express = require("express");
 const db = require("./config/db.config.js");
 const userRoutes = require("./routes/user.routes.js");
+<<<<<<< Updated upstream
 const courseRoutes = require("./routes/course.routes.js");
+=======
+const trainerRoutes = require("./routes/trainer.routes.js");
+>>>>>>> Stashed changes
 
 // Initialize Express app
 const app = express();
