@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("./config/db.config.js");
 const userRoutes = require("./routes/user.routes.js");
+const courseRoutes = require("./routes/course.routes.js");
 const trainerRoutes = require("./routes/trainer.routes.js");
 
 // Initialize Express app
@@ -21,15 +22,17 @@ db.authenticate()
 // Define routes
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
+app.use("/api/trainers", trainerRoutes);
+app.use("/api/student", studentCourseRoutes);
 
-app.get("/data", (req, res) => {
-  db.query("SELECT * FROM students", (error, results) => {
-    if (error) {
-      return res.status(500).send("Error occurred: " + error.message);
-    }
-    res.json(results);
-  });
-});
+// app.get("/data", (req, res) => {
+//   db.query("SELECT * FROM students", (error, results) => {
+//     if (error) {
+//       return res.status(500).send("Error occurred: " + error.message);
+//     }
+//     res.json(results);
+//   });
+// });
 
 // Set up a basic route
 app.get("/", (req, res) => {
