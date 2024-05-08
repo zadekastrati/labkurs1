@@ -1,6 +1,7 @@
 // Material Dashboard 2 React layouts
 import Dashboard from "layouts/dashboard";
 import Users from "layouts/users";
+import Roles from "layouts/roles";
 import Trainers from "layouts/trainers";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
@@ -27,6 +28,14 @@ const routes = [
     icon: <Icon fontSize="small">persons</Icon>,
     route: "/users",
     component: <Users />,
+  },
+  {
+    type: "collapse",
+    name: "Roles",
+    key: "roles",
+    icon: <Icon fontSize="small">persons</Icon>,
+    route: "/roles",
+    component: <Roles />,
   },
   {
     type: "collapse",

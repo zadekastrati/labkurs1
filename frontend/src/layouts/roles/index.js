@@ -3,20 +3,22 @@ import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import MDBox from "components/MDBox";
-import MDBadge from "@mui/material/Badge";
 import MDTypography from "components/MDTypography";
+import MDAlert from "components/MDAlert";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/users/DataTable";
+import DataTable from "layouts/roles/DataTable";
+import { Link } from "react-router-dom";
 
-function Users() {
-  const [userData, setUserData] = useState([]);
+function Roles() {
+  const [roleData, setRoleData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/users")
+    fetch("http://localhost:8080/api/roles")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch data");
@@ -26,26 +28,32 @@ function Users() {
       .then((data) => {
         console.log("Fetched data:", data);
         const formattedData = data.map((item) => ({
-          user: (
-            <Author name={item.name} email={item.email} />
-          ),
-          role: (
-            <MDBox ml={2}>
-              <MDBadge badgeContent={item.role} color="info" variant="gradient" size="sm" />
-            </MDBox>
-          ),
+          title: <Author title={item.title} />,
           action: (
             <MDBox display="flex" alignItems="center">
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+              <MDTypography
+                component="a"
+                href="#"
+                variant="caption"
+                color="text"
+                fontWeight="medium"
+              >
                 Edit
               </MDTypography>
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }}>
+              <MDTypography
+                component="a"
+                href="#"
+                variant="caption"
+                color="text"
+                fontWeight="medium"
+                sx={{ ml: 1 }}
+              >
                 Delete
               </MDTypography>
             </MDBox>
           ),
         }));
-        setUserData(formattedData);
+        setRoleData(formattedData);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -55,27 +63,30 @@ function Users() {
       });
   }, []);
 
-  const Author = ({ name, email }) => (
+  const Author = ({ title }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDBox lineHeight={1}>
         <MDTypography display="block" variant="button" fontWeight="medium">
-          {name}
+          {title}
         </MDTypography>
-        <MDTypography variant="caption">{email}</MDTypography>
       </MDBox>
     </MDBox>
   );
 
   const columns = [
-    { Header: "User", accessor: "user", width: "45%", align: "left" },
-    { Header: "Role", accessor: "role", align: "left" },
-    { Header: "Action", accessor: "action", align: "right" }
+    { Header: "Title", accessor: "title", width: "45%", align: "left" },
+    { Header: "Action", accessor: "action", align: "right" },
   ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button component="a" href="CreateUserModal" variant="contained" color="inherit" sx={{ ml: 2 }}>
+      {showSuccessAlert && (
+        <MDAlert color="success" dismissible onClose={() => setShowSuccessAlert(false)}>
+          Role created successfully
+        </MDAlert>
+      )}
+      <Button component={Link} to="/create_role" variant="contained" color="inherit" sx={{ ml: 2 }}>
         Create
       </Button>
       <MDBox pt={6} pb={3}>
@@ -93,7 +104,7 @@ function Users() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Users
+                  Roles
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -103,7 +114,7 @@ function Users() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: userData }}
+                    table={{ columns, rows: roleData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -120,4 +131,4 @@ function Users() {
   );
 }
 
-export default Users;
+export default Roles;
