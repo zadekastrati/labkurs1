@@ -1,7 +1,12 @@
 const express = require("express");
 const db = require("./config/db.config.js");
+<<<<<<< HEAD
 const cors = require('cors');
+=======
+const cors = require("cors");
+>>>>>>> 2d1ff460b9cd5f791f4c73dd501513ccd6c0768d
 const userRoutes = require("./routes/user.routes.js");
+const rolesRoutes = require("./routes/roles.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
 const trainerRoutes = require("./routes/trainer.routes.js");
 const studentCoursesRoutes = require("./routes/student_course.routes.js");
@@ -25,6 +30,7 @@ db.authenticate()
 
 // Define routes
 app.use("/api/users", userRoutes);
+app.use("/api/roles", rolesRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/student", studentCoursesRoutes);

@@ -1,4 +1,4 @@
-const Trainer = require('../models/trainer.model.js');
+const Trainer = require('../models/trainer.models.js');
 
 // Create a new trainer
 async function createTrainer(req, res) {
