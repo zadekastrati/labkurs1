@@ -23,7 +23,16 @@ import CreateRole from "layouts/roles/create";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
-  const { miniSidenav, direction, layout, openConfigurator, sidenavColor, transparentSidenav, whiteSidenav, darkMode } = controller;
+  const {
+    miniSidenav,
+    direction,
+    layout,
+    openConfigurator,
+    sidenavColor,
+    transparentSidenav,
+    whiteSidenav,
+    darkMode,
+  } = controller;
   const [onMouseEnter, setOnMouseEnter] = useState(false);
   const [rtlCache, setRtlCache] = useState(null);
   const { pathname } = useLocation();
@@ -114,7 +123,7 @@ export default function App() {
             <Sidenav
               color={sidenavColor}
               brand={(transparentSidenav && !darkMode) || whiteSidenav ? brandDark : brandWhite}
-              brandName="Material Dashboard 2"
+              brandName="Coders Academy"
               routes={routes}
               onMouseEnter={handleOnMouseEnter}
               onMouseLeave={handleOnMouseLeave}
@@ -129,6 +138,11 @@ export default function App() {
           {/* Add the route for CreateRole component */}
           <Route path="/create_role" element={<CreateRole />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+        <Routes>
+          {getRoutes(routes)}
+          <Route path="/create_role" element={<CreateRole />} />
+          {/* Add the route for UpdateRole component */}
         </Routes>
       </ThemeProvider>
     </CacheProvider>
