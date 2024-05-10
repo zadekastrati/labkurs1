@@ -1,20 +1,20 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db.config.js');
 
-const Course = db.define('Course', {
+const Category = db.define('Category', {
     id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true
     },
-    title: {
+    name: {
         type: DataTypes.STRING(255),
         allowNull: false
     },
     description: {
         type: DataTypes.TEXT,
-        allowNull: false
+        allowNull: true  // Making this optional
     },
     createdAt: {
         type: DataTypes.DATE,
@@ -28,4 +28,4 @@ const Course = db.define('Course', {
     },
 });
 
-module.exports = Course;
+module.exports = Category;
