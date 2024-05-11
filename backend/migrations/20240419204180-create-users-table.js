@@ -18,11 +18,11 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      roleId: { 
+      roleId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'MigrationRoles', 
+          model: 'Roles',
           key: 'id'
         },
         onUpdate: 'CASCADE',
@@ -44,7 +44,6 @@ module.exports = {
       }
     });
   },
-
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('users');
   }

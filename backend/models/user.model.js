@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db.config.js');
 const bcrypt = require('bcrypt');
+const Role = require("./roles.model.js");
 
 const User = db.define('User', {
   name: {
@@ -15,8 +16,8 @@ const User = db.define('User', {
       isEmail: true,
     },
   },
-  role: {
-    type: DataTypes.STRING,
+  roleId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
   password: {
@@ -45,5 +46,7 @@ const User = db.define('User', {
     },
   },
 });
+
+User.belongsTo(Role, { foreignKey: 'roleId' });
 
 module.exports = User;
