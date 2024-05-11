@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import { Dialog, DialogContent, TextField, DialogActions } from '@mui/material';
+import { debounce } from 'lodash';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
@@ -17,114 +18,147 @@ function Courses() {
   const [error, setError] = useState(null);
   const [openModal, setOpenModal] = useState(false); // State for controlling modal visibility
   const [newCourse, setNewCourse] = useState({ title: '', description: '' });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCourse, setEditingCourse] = useState(null);
+  const [renderKey, setRenderKey] = useState(0);
 
-  const handleOpenModal = () => setOpenModal(true);
-  const handleCloseModal = () => setOpenModal(false);
-
+  const handleOpenModal = () => {
+    setNewCourse({ title: '', description: '' });  // Reset the form fields
+    setIsEditing(false);  // Ensure we're not in editing mode
+    setOpenModal(true);
+  };
+ 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewCourse(prevState => ({ ...prevState, [name]: value }));
   };
-
+ 
   const handleSubmit = async () => {
+    const url = isEditing ? `http://localhost:8080/api/courses/${editingCourse.id}` : 'http://localhost:8080/api/courses';
+    const method = isEditing ? 'PUT' : 'POST';
+  
     try {
-      const response = await fetch('http://localhost:8080/api/courses', {
-        method: 'POST',
+      const response = await fetch(url, {
+        method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newCourse)
       });
       if (response.ok) {
-        const newCourseData = await response.json();
-        // Ensure the new data structure is correct
-        const formattedNewCourse = {
-          courses: (
-            <MDBox display="flex" alignItems="center">
-              <MDTypography display="block" variant="button" fontWeight="medium">
-                {newCourseData.title}
-              </MDTypography>
-            </MDBox>
-          ),
-          description: (
-            <MDBox display="flex" alignItems="center">
-              <MDTypography display="block" variant="button" fontWeight="medium">
-                {newCourseData.description}
-              </MDTypography>
-            </MDBox>
-          ),
-          action: (
-            <MDBox display="flex" alignItems="center">
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-                Edit
-              </MDTypography>
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }}>
-                Delete
-              </MDTypography>
-            </MDBox>
-          ),
-        };
-        setCourseData([...courseData, formattedNewCourse]); // Add new course in the same structure as others
-        handleCloseModal(); // Close modal on successful creation
+        const updatedCourseData = await response.json();
+        setCourseData(currentData => {
+          const newData = isEditing ? 
+            currentData.map(course => 
+              course.key === editingCourse.id ? {...course, ...updatedCourseData} : course
+            ) : 
+            [...currentData, formattedNewCourse(updatedCourseData)];
+          console.log("New data array after update:", newData); // Log to verify the immediate update
+          return newData;
+        });
+        
+        setRenderKey(prevKey => prevKey + 1); // This is one way to force a rerender
+        setOpenModal(false);  // Close the modal after successful operation
       } else {
-        throw new Error('Failed to create course');
+        console.error("HTTP error:", response.status);
       }
     } catch (error) {
       console.error('Error:', error);
     }
   };
-  useEffect(() => {
-    fetch("http://localhost:8080/api/courses")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const formattedData = data.map((item) => ({
-          key: item.id,
-          courses: (
-            <MDBox display="flex" alignItems="center">
-              <MDTypography display="block" variant="button" fontWeight="medium">
-                {item.title}
-              </MDTypography>
-            </MDBox>
-          ),
-          description: (
-            <MDBox display="flex" alignItems="center">
-              <MDTypography display="block" variant="button" fontWeight="medium">
-                {item.description}
-              </MDTypography>
-            </MDBox>
-          ),
-          action: (
-            <MDBox display="flex" alignItems="center">
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
-                Edit
-              </MDTypography>
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }} onClick={() => handleDeleteClick(item.id)}>
-                Delete
-              </MDTypography>
-            </MDBox>
-          ),
-        }));
-        setCourseData(formattedData);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false);
-      });
-  }, []);
+  
+  
+  const handleCloseModal = () => {
+    setNewCourse({ title: '', description: '' }); // Reset the form to initial state
+    setIsEditing(false); // Ensure we're not in editing mode
+    setOpenModal(false); // Close the modal
+  };
+  
+  
+  
+  const formattedNewCourse = (courseData) => ({
+    key: courseData.id,
+    courses: (
+      <MDBox display="flex" alignItems="center">
+        <MDTypography display="block" variant="button" fontWeight="medium">
+          {courseData.title}
+        </MDTypography>
+      </MDBox>
+    ),
+    description: (
+      <MDBox display="flex" alignItems="center">
+        <MDTypography display="block" variant="button" fontWeight="medium">
+          {courseData.description}
+        </MDTypography>
+      </MDBox>
+    ),
+    action: (
+      <MDBox display="flex" alignItems="center">
+        <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" onClick={() => handleOpenEditModal(courseData)}>
+          Edit
+        </MDTypography>
+        <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }} onClick={() => handleDeleteClick(courseData.id)}>
+          Delete
+        </MDTypography>
+      </MDBox>
+    ),
+  });  
+ useEffect(() => {
+  const fetchData = async () => {
+    setIsLoading(true); // Set loading to true at the start of the fetch
+    try {
+      const response = await fetch("http://localhost:8080/api/courses");
+      if (!response.ok) throw new Error("Failed to fetch data");
+      const data = await response.json();
+      const formattedData = data.map((item) => ({
+        key: item.id,
+        courses: (
+          <MDBox display="flex" alignItems="center">
+            <MDTypography display="block" variant="button" fontWeight="medium">
+              {item.title}
+            </MDTypography>
+          </MDBox>
+        ),
+        description: (
+          <MDBox display="flex" alignItems="center">
+            <MDTypography display="block" variant="button" fontWeight="medium">
+              {item.description}
+            </MDTypography>
+          </MDBox>
+        ),
+        action: (
+          <MDBox display="flex" alignItems="center">
+            <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" onClick={() => handleOpenEditModal(item)}>
+              Edit
+            </MDTypography>
+            <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }} onClick={() => handleDeleteClick(item.id)}>
+              Delete
+            </MDTypography>
+          </MDBox>
+        ),
+      }));
+      setCourseData(formattedData); // Update the state with formatted data
+      setIsLoading(false); // Set loading to false after the data is loaded
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error); // Set the error state
+      setIsLoading(false); // Ensure loading is set to false on error
+    }
+  };
+
+  fetchData();
+}, []); // Empty dependency array ensures this effect only runs once when the component mounts
+
+useEffect(() => {
+  console.log("Course data updated:", courseData);
+}, [courseData]);
+
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
 const [selectedCourseId, setSelectedCourseId] = useState(null);
 
-const handleDeleteClick = (courseId) => {
+const handleDeleteClick = useCallback((courseId) => {
   console.log("Deleting course with ID:", courseId);
   setOpenConfirmDialog(true);
   setSelectedCourseId(courseId);
-};
-
+}, []); // No dependencies are listed here.
 
 const cancelDelete = () => {
   setOpenConfirmDialog(false);
@@ -151,7 +185,7 @@ const handleDelete = async (courseId) => {
     console.error('Error:', error);
   }
 };
-const proceedDelete = async () => {
+ const proceedDelete = async () => {
   try {
     const response = await fetch(`http://localhost:8080/api/courses/${selectedCourseId}`, {
       method: 'DELETE',
@@ -168,7 +202,14 @@ const proceedDelete = async () => {
   } catch (error) {
     console.error('Error:', error);
   }
-};  
+};
+const handleOpenEditModal = (course) => {
+  setNewCourse({ title: course.title, description: course.description });
+  setEditingCourse(course);
+  setIsEditing(true);
+  setOpenModal(true);
+};
+
   const Author = ({ name,description }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDBox lineHeight={1}>
@@ -223,7 +264,7 @@ const proceedDelete = async () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button onClick={handleSubmit}>Create</Button>
+          <Button onClick={handleSubmit}>{isEditing ? "Update" : "Create"}</Button>
         </DialogActions>
       </Dialog>
       {/* Confirmation Dialog for Deleting a Course */}
@@ -251,6 +292,7 @@ const proceedDelete = async () => {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
+                  key={renderKey}
                     table={{ columns, rows: courseData }}
                     isSorted={false}
                     entriesPerPage={false}
