@@ -18,9 +18,15 @@ module.exports = {
         allowNull: false,
         unique: true
       },
-      role: {
-        type: Sequelize.STRING,
-        allowNull: false
+      roleId: { 
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'MigrationRoles', 
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       password: {
         type: Sequelize.STRING,

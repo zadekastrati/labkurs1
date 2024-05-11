@@ -33,7 +33,7 @@ export default function data() {
         course: <Course image={course1Image} title="Mathematics" description="Advanced calculus" />,
         grade: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="A" color="info" variant="gradient" size="sm" />
+            <MDBadge badgeContent="9" color="info" variant="gradient" size="sm" />
           </MDBox>
         ),
         action: (
@@ -51,7 +51,7 @@ export default function data() {
         course: <Course image={course2Image} title="Physics" description="Quantum mechanics" />,
         grade: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="B" color="warning" variant="gradient" size="sm" />
+            <MDBadge badgeContent="9" color="warning" variant="gradient" size="sm" />
           </MDBox>
         ),
         action: (
@@ -69,7 +69,7 @@ export default function data() {
         course: <Course image={course3Image} title="Computer Science" description="Web development" />,
         grade: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="C" color="error" variant="gradient" size="sm" />
+            <MDBadge badgeContent="10" color="error" variant="gradient" size="sm" />
           </MDBox>
         ),
         action: (

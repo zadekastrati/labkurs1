@@ -9,6 +9,7 @@ import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/users/DataTable";
+import { Link } from "react-router-dom";
 
 function Users() {
   const [userData, setUserData] = useState([]);
@@ -26,9 +27,7 @@ function Users() {
       .then((data) => {
         console.log("Fetched data:", data);
         const formattedData = data.map((item) => ({
-          user: (
-            <Author name={item.name} email={item.email} />
-          ),
+          user: <Author name={item.name} email={item.email} />,
           role: (
             <MDBox ml={2}>
               <MDBadge badgeContent={item.role} color="info" variant="gradient" size="sm" />
@@ -36,10 +35,24 @@ function Users() {
           ),
           action: (
             <MDBox display="flex" alignItems="center">
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium">
+              <MDTypography
+                component={Link}
+                to={`/edit_user/${userId}`} 
+                variant="caption"
+                color="text"
+                fontWeight="medium"
+              >
                 Edit
               </MDTypography>
-              <MDTypography component="a" href="#" variant="caption" color="text" fontWeight="medium" sx={{ ml: 1 }}>
+
+              <MDTypography
+                component="a"
+                href="#"
+                variant="caption"
+                color="text"
+                fontWeight="medium"
+                sx={{ ml: 1 }}
+              >
                 Delete
               </MDTypography>
             </MDBox>
@@ -69,13 +82,13 @@ function Users() {
   const columns = [
     { Header: "User", accessor: "user", width: "45%", align: "left" },
     { Header: "Role", accessor: "role", align: "left" },
-    { Header: "Action", accessor: "action", align: "right" }
+    { Header: "Action", accessor: "action", align: "right" },
   ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button component="a" href="CreateUserModal" variant="contained" color="inherit" sx={{ ml: 2 }}>
+      <Button component={Link} to="/create_user" variant="contained" color="inherit" sx={{ ml: 2 }}>
         Create
       </Button>
       <MDBox pt={6} pb={3}>

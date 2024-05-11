@@ -7,6 +7,7 @@ const courseRoutes = require("./routes/course.routes.js");
 const trainerRoutes = require("./routes/trainer.routes.js");
 const certificateRoutes = require("./routes/certificate.routes.js");
 const studentCoursesRoutes = require("./routes/student_course.routes.js");
+const categoriesRoutes = require("./routes/categories.routes.js");
 
 // Initialize Express app
 const app = express();
@@ -32,6 +33,7 @@ app.use("/api/courses", courseRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/certificates", certificateRoutes);
 app.use("/api/student", studentCoursesRoutes);
+app.use("/api/categories", categoriesRoutes);
 
 // app.get("/data", (req, res) => {
 //   db.query("SELECT * FROM students", (error, results) => {

@@ -4,18 +4,40 @@ import Card from "@mui/material/Card";
 import Button from "@mui/material/Button";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDAlert from "components/MDAlert";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/roles/DataTable";
 import { Link } from "react-router-dom";
 
+
 function Roles() {
   const [roleData, setRoleData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const handleDeleteRole = (roleId) => {
+    const isConfirmed = window.confirm('Are you sure you want to delete this role?');
+    
+    if (!isConfirmed) {
+      return;
+    }
+  
+    fetch(`http://localhost:8080/api/roles/${roleId}`, {
+      method: 'DELETE',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to delete role');
+        }
+        // Remove the deleted role from roleData state
+        setRoleData((prevData) => prevData.filter((item) => item.id !== roleId));
+      })
+      .catch((error) => {
+        console.error('Error deleting role:', error);
+        // Handle error
+      });
+  }; 
+  
 
   useEffect(() => {
     fetch("http://localhost:8080/api/roles")
@@ -31,25 +53,24 @@ function Roles() {
           title: <Author title={item.title} />,
           action: (
             <MDBox display="flex" alignItems="center">
-              <MDTypography
-                component="a"
-                href="#"
+              <Button
+                component={Link}
+                to={`/update_role/${item.id}`}
                 variant="caption"
-                color="text"
-                fontWeight="medium"
-              >
-                Edit
-              </MDTypography>
-              <MDTypography
-                component="a"
-                href="#"
-                variant="caption"
-                color="text"
                 fontWeight="medium"
                 sx={{ ml: 1 }}
               >
+                Edit
+              </Button>
+
+              <Button
+                variant="caption"
+                fontWeight="medium"
+                sx={{ ml: 1 }}
+                onClick={() => handleDeleteRole(item.id)}
+              >
                 Delete
-              </MDTypography>
+              </Button>
             </MDBox>
           ),
         }));
@@ -81,11 +102,6 @@ function Roles() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      {showSuccessAlert && (
-        <MDAlert color="success" dismissible onClose={() => setShowSuccessAlert(false)}>
-          Role created successfully
-        </MDAlert>
-      )}
       <Button component={Link} to="/create_role" variant="contained" color="inherit" sx={{ ml: 2 }}>
         Create
       </Button>
@@ -114,12 +130,27 @@ function Roles() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: roleData }}
-                    isSorted={false}
-                    entriesPerPage={false}
-                    showTotalEntries={false}
-                    noEndBorder
-                  />
+                  table={{
+                    columns,
+                    rows: roleData,
+                  }}
+                  isSorted={false}
+                  entriesPerPage={false}
+                  showTotalEntries={false}
+                  noEndBorder
+                  actions={{
+                    delete: (item) => (
+                      <Button
+                        variant="caption"
+                        fontWeight="medium"
+                        sx={{ ml: 1 }}
+                        onClick={() => handleDeleteRole(item.id)}
+                      >
+                        Delete
+                      </Button>
+                    ),
+                  }}
+                />                
                 )}
               </MDBox>
             </Card>
