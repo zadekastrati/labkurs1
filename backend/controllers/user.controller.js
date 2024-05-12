@@ -1,11 +1,12 @@
-const User = require('../models/user.model.js');
+const Role = require("../models/roles.model.js");
+const User = require("../models/user.model.js");
 
 // Create a new user
 async function createUser(req, res) {
   try {
-    const { name, email, role, password } = req.body;
+    const { name, email, roleId, password } = req.body;
 
-    const user = await User.create({ name, email, role, password });
+    const user = await User.create({ name, email, roleId, password });
 
     res.status(201).json(user);
   } catch (err) {
@@ -17,7 +18,9 @@ exports.createUser = createUser;
 // Retrieve all users
 async function getAllUsers(req, res) {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      include: Role
+    });
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: err.message });

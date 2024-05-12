@@ -1,6 +1,5 @@
 const { DataTypes } = require("sequelize");
 const db = require("../config/db.config.js");
-const bcrypt = require("bcrypt");
 
 const Role = db.define(
   "Role",
@@ -22,5 +21,4 @@ const Role = db.define(
   },
   {}
 );
-
 module.exports = Role;
