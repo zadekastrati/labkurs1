@@ -8,31 +8,32 @@ const Certificate = db.define('Certificate', {
     primaryKey: true,
     autoIncrement: true
   },
-  trainer_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'trainers',
-      key: 'id'
-    }
-  },
+  
   title: {
     type: DataTypes.STRING,
     allowNull: false
   },
-  issuer: {
-    type: DataTypes.STRING,
-    allowNull: false
+
+  studentsName: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
   },
+  courseType:{
+    type: DataTypes.STRING(255),
+    allowNull: false,
+  },
+
   date: {
     type: DataTypes.DATE,
     allowNull: false
   },
+
   createdAt: {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW
   },
+
   updatedAt: {
     type: DataTypes.DATE,
     allowNull: false,

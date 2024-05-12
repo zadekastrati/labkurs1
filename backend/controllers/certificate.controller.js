@@ -3,8 +3,8 @@ const Certificate = require('../models/certificate.model.js');
 // Create a new certificate
 async function createCertificate(req, res) {
     try {
-        const { trainer_id, title, issuer, date } = req.body;
-        const certificate = await Certificate.create({ trainer_id, title, issuer, date });
+        const { id, title, studentsName, courseType, date } = req.body;
+        const certificate = await Certificate.create({ id, title, studentsName, courseType, date });
         res.status(201).json(certificate);
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -43,8 +43,8 @@ exports.getCertificateById = getCertificateById;
 async function updateCertificate(req, res) {
     const id = req.params.id;
     try {
-        const { title, issuer, date } = req.body;
-        const [updatedRowsCount, updatedRows] = await Certificate.update({ title, issuer, date }, {
+       
+        const [updatedRowsCount, updatedRows] = await Certificate.update(req.body, {
             where: { id },
             returning: true,
         });

@@ -1,8 +1,8 @@
 import express from 'express';
-import { getAllCertificatesWithTrainers } from './controllers/certificate.controller.js';
+import { getCertificates } from './backend/certificate.controller.js';
 
 const router = express.Router();
 
-router.get('/certificates', getAllCertificatesWithTrainers);
+router.get('/certificates', getCertificates);
 
 export default router;
