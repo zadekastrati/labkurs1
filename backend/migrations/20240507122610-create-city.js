@@ -13,10 +13,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      population: {
-        type: Sequelize.INTEGER,
-        allowNull: true // Adjust as needed
-      },
       // Add more attributes as necessary
       createdAt: {
         type: Sequelize.DATE,

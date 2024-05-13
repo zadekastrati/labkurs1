@@ -6,10 +6,6 @@ const City = db.define('City', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  population: {
-    type: DataTypes.INTEGER,
-    allowNull: true, // Adjust as needed
-  },
   // Add more attributes as necessary
   createdAt: {
     type: DataTypes.DATE,
