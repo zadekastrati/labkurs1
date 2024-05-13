@@ -1,45 +1,49 @@
-'use strict';
+"use strict";
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable("certificates", {
       id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         primaryKey: true,
-        autoIncrement: true
+        autoIncrement: true,
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: false
-      },
-      email: {
+      title: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true
       },
-      role: {
+      studentsName: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
-      password: {
+
+      courseType: {
         type: Sequelize.STRING,
-        allowNull: false
+        allowNull: false,
       },
+
+      date: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updatedAt: {
         type: Sequelize.DATE,
         allowNull: false,
-        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')
-      }
+        defaultValue: Sequelize.literal(
+          "CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
+        ),
+      },
     });
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users');
-  }
+    await queryInterface.dropTable("certificates");
+  },
 };

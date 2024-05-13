@@ -1,12 +1,10 @@
-const Trainer = require('../models/trainer.models.js');
+const Trainer = require("../models/trainer.model.js");
 
 // Create a new trainer
 async function createTrainer(req, res) {
   try {
-    const { name, specialization } = req.body;
-
-    const trainer = await Trainer.create({ name, specialization });
-
+    const { trainersName, specialization } = req.body;
+    const trainer = await Trainer.create({ trainersName, specialization });
     res.status(201).json(trainer);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -14,7 +12,7 @@ async function createTrainer(req, res) {
 }
 exports.createTrainer = createTrainer;
 
-// Retrieve all trainers
+// Retrieve all
 async function getAllTrainers(req, res) {
   try {
     const trainers = await Trainer.findAll();
