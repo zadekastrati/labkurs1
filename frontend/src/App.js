@@ -20,6 +20,8 @@ import { useMaterialUIController, setMiniSidenav, setOpenConfigurator } from "co
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
 import CreateRole from "layouts/roles/create";
+import CreateStudents from "layouts/students/create";
+
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -130,6 +132,16 @@ export default function App() {
           <Route path="/create_role" element={<CreateRole />} />
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
+        <Routes>
+          {getRoutes(routes)}
+          {/* Add the route for CreateStudent component */}
+          <Route path="/create_students" element={<CreateStudents />} />
+          <Route path="*" element={<Navigate to="/dashboard" />} />
+        </Routes>
+
+       
+        
+  
       </ThemeProvider>
     </CacheProvider>
   ) : (
@@ -156,6 +168,11 @@ export default function App() {
         <Route path="/create_role" element={<CreateRole />} />
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+     
+      
+      
+
     </ThemeProvider>
+    
   );
 }

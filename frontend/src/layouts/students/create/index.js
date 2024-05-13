@@ -8,10 +8,9 @@ import MDBox from "components/MDBox";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 
-
-function CreateRole() {
+function CreateStudent() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ title: "" });
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", city: "", age: "" });
   const [showSuccessAlert, setShowSuccessAlert] = useState();
 
   const handleInputChange = (e) => {
@@ -23,27 +22,26 @@ function CreateRole() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/roles", {
+      const response = await fetch("http://localhost:8080/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create role");
+        throw new Error("Failed to create student");
       }
 
       // Show success alert message
       setShowSuccessAlert(true);
 
-     
-      navigate("/roles");
+      navigate("/students");
 
       // Handle success
-      console.log("Role created successfully");
+      console.log("Student created successfully");
     } catch (error) {
       // Handle error
-      console.error("Error creating role:", error.message);
+      console.error("Error creating student:", error.message);
     }
   };
 
@@ -51,15 +49,45 @@ function CreateRole() {
     <DashboardLayout>
       <DashboardNavbar />
       <div className="container mt-5 mb-5">
-        <h2 className="mb-5">Create a New Role</h2>
+        <h2 className="mb-5">Create a New Student</h2>
         <Form onSubmit={handleSubmit}>
           <MDBox mb={2}>
             <MDInput
               type="text"
-              label="Title"
+              label="First Name"
               fullWidth
-              name="title"
-              value={formData.title}
+              name="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+            />
+          </MDBox>
+          <MDBox mb={2}>
+            <MDInput
+              type="text"
+              label="Last Name"
+              fullWidth
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+            />
+          </MDBox>
+          <MDBox mb={2}>
+            <MDInput
+              type="text"
+              label="City"
+              fullWidth
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+            />
+          </MDBox>
+          <MDBox mb={2}>
+            <MDInput
+              type="number"
+              label="Age"
+              fullWidth
+              name="age"
+              value={formData.age}
               onChange={handleInputChange}
             />
           </MDBox>
@@ -75,4 +103,5 @@ function CreateRole() {
   );
 }
 
-export default CreateRole;
+export default CreateStudent;
+
