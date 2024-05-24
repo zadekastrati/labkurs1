@@ -17,6 +17,16 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: false
       },
+      categoryId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Categories',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -33,4 +43,4 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('Courses');
   }
-};
+}

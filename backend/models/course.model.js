@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db.config.js');
+const Category = require("./categories.model.js");
 
 const Course = db.define('Course', {
     id: {
@@ -16,6 +17,10 @@ const Course = db.define('Course', {
         type: DataTypes.TEXT,
         allowNull: false
     },
+    categoryId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -27,5 +32,6 @@ const Course = db.define('Course', {
         defaultValue: DataTypes.NOW
     },
 });
+Course.belongsTo(Category, { foreignKey: 'categoryId' });
 
 module.exports = Course;
