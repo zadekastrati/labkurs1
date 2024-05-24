@@ -7,8 +7,9 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import Course from "layouts/courses";
-import Categories from "layouts/categories"; // Import Categories
-
+import Categories from "layouts/categories";
+import Students from "layouts/students";
+import City from "layouts/city";
 // @mui icons 
 import Icon from "@mui/material/Icon";
 
