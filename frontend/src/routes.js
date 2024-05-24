@@ -7,14 +7,12 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import Course from "layouts/courses";
-import Students from "layouts/students";
-import City from "layouts/city";
+import Categories from "layouts/categories"; // Import Categories
 
 // @mui icons 
 import Icon from "@mui/material/Icon";
 
 const routes = [
-
   {
     type: "collapse",
     name: "Dashboard",
@@ -54,7 +52,15 @@ const routes = [
     icon: <Icon fontSize="small">school</Icon>,
     route: "/courses",
     component: <Course />,
-  }, 
+  },
+  {
+    type: "collapse",
+    name: "Categories",
+    key: "categories",
+    icon: <Icon fontSize="small">category</Icon>,
+    route: "/categories",
+    component: <Categories />,
+  },
   {
     type: "collapse",
     name: "Profile",
@@ -89,7 +95,6 @@ const routes = [
     route: "/notifications",
     component: <Notifications />,
   },
- 
   {
     type: "collapse",
     name: "Sign In",
