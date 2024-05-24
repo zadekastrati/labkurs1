@@ -1,14 +1,25 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db.config.js');
-const bcrypt = require('bcrypt');
 
-const Trainer = db.define('Trainer', {
-  name: {
+const Student = db.define('Student', {
+  firstName: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  specialization: {
+  lastName: {
     type: DataTypes.STRING,
+    allowNull: false,
+  },
+  city: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  age: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    validate: {
+      min: 0,
+    },
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -20,14 +31,6 @@ const Trainer = db.define('Trainer', {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
-}, {
-  hooks: {
-    beforeCreate: async (trainer) => {
-      // Hash the password before creating the user
-      const hashedPassword = await bcrypt.hash(trainer.password, 10);
-      trainer.password = hashedPassword;
-    },
-  },
 });
 
-module.exports = Trainer;
+module.exports = Student;

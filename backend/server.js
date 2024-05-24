@@ -5,8 +5,10 @@ const userRoutes = require("./routes/user.routes.js");
 const rolesRoutes = require("./routes/roles.routes.js");
 const courseRoutes = require("./routes/course.routes.js");
 const trainerRoutes = require("./routes/trainer.routes.js");
+const certificateRoutes = require("./routes/certificate.routes.js");
 const studentCoursesRoutes = require("./routes/student_course.routes.js");
 const categoriesRoutes = require("./routes/categories.routes.js");
+const cityRoutes = require("./routes/city.routes.js");
 
 // Initialize Express app
 const app = express();
@@ -30,8 +32,10 @@ app.use("/api/users", userRoutes);
 app.use("/api/roles", rolesRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/trainers", trainerRoutes);
+app.use("/api/certificates", certificateRoutes);
 app.use("/api/student", studentCoursesRoutes);
 app.use("/api/categories", categoriesRoutes);
+app.use("/api/city", cityRoutes);
 
 // app.get("/data", (req, res) => {
 //   db.query("SELECT * FROM students", (error, results) => {
