@@ -1,11 +1,12 @@
-const Student = require('../models/student.model.js');
+const City = require("../models/city.model");
+const Student = require("../models/students.model");
 
 // Create a new student
 async function createStudent(req, res) {
   try {
-    const { firstName, lastName, city, age } = req.body;
+    const { firstName, lastName, cityId } = req.body;
 
-    const student = await Student.create({ firstName, lastName, city, age });
+    const student = await Student.create({ firstName, lastName, cityId });
 
     res.status(201).json(student);
   } catch (err) {
@@ -17,7 +18,9 @@ exports.createStudent = createStudent;
 // Retrieve all students
 async function getAllStudents(req, res) {
   try {
-    const students = await Student.findAll();
+    const students = await Student.findAll({
+      include: City
+    });
     res.status(200).json(students);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -29,7 +32,9 @@ exports.getAllStudents = getAllStudents;
 async function getStudentById(req, res) {
   const id = req.params.id;
   try {
-    const student = await Student.findByPk(id);
+    const student = await Student.findByPk(id, {
+      include: City
+    });
     if (!student) {
       res.status(404).json({ message: `Student with id ${id} not found` });
     } else {
@@ -44,17 +49,39 @@ exports.getStudentById = getStudentById;
 // Update a student by id
 async function updateStudent(req, res) {
   const id = req.params.id;
+  const { firstName, lastName, cityId } = req.body;
+
   try {
-    const [updatedRowsCount, updatedRows] = await Student.update(req.body, {
-      where: { id },
-      returning: true,
-    });
-    if (updatedRowsCount === 0) {
-      res.status(404).json({ message: `Student with id ${id} not found` });
-    } else {
-      res.status(200).json(updatedRows[0]);
+    // Log the incoming request data
+    console.log('Received update request for student:', { id, firstName, lastName, cityId });
+
+    // Check if the student exists
+    const student = await Student.findByPk(id);
+    if (!student) {
+      return res.status(404).json({ message: `Student with id ${id} not found` });
     }
+
+    // Perform the update operation
+    const [updatedRowsCount, updatedRows] = await Student.update(
+      { firstName, lastName, cityId },
+      {
+        where: { id },
+        returning: true,
+      }
+    );
+
+    // Log the result of the update operation
+    console.log('Update operation result:', { updatedRowsCount, updatedRows });
+
+    // Check if the update operation was successful
+    if (updatedRowsCount === 0) {
+      return res.status(500).json({ message: `Failed to update student with id ${id}` });
+    }
+
+    // Return the updated student
+    res.status(200).json(updatedRows[0]);
   } catch (err) {
+    console.error('Error updating student:', err);
     res.status(500).json({ message: err.message });
   }
 }
@@ -75,4 +102,3 @@ async function deleteStudent(req, res) {
   }
 }
 exports.deleteStudent = deleteStudent;
-

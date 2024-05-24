@@ -10,6 +10,7 @@ import Footer from "examples/Footer";
 import DataTable from "layouts/roles/DataTable";
 import { Link } from "react-router-dom";
 import RoleForm from "layouts/roles/form";
+import Icon from '@mui/material/Icon';
 
 function Roles() {
   const [roleData, setRoleData] = useState([]);
@@ -97,22 +98,29 @@ function Roles() {
         action: (
           <MDBox display="flex" alignItems="center">
             <Button
-              component={Link}
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
-              onClick={() => handleOpenUpdateModal(item)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
-              onClick={() => handleOpenDeleteModal(item.id)}
-            >
-              Delete
-            </Button>
+                component={Link}
+                variant="caption"
+                fontWeight="medium"
+                onClick={() => handleOpenUpdateModal(item)}
+                sx={{ minWidth: 0, padding: '4px',
+                ':hover': {
+                  color: 'blue', 
+                }}}
+              >
+                <Icon fontSize="small">edit</Icon>
+              </Button>
+
+              <Button
+                variant="caption"
+                fontWeight="medium"
+                onClick={() => handleOpenDeleteModal(item.id)}
+                sx={{ minWidth: 0, padding: '4px',
+                ':hover': {
+                  color: 'red', 
+                }}}
+              >
+                <Icon fontSize="small">delete</Icon>
+              </Button>
           </MDBox>
         ),
       }));

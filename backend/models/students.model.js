@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const db = require('../config/db.config.js');
+const City = require("./city.model.js");
 
 const Student = db.define('Student', {
   firstName: {
@@ -10,16 +11,9 @@ const Student = db.define('Student', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  city: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  age: {
+  cityId: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    validate: {
-      min: 0,
-    },
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -31,6 +25,9 @@ const Student = db.define('Student', {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
+}, {
 });
+
+Student.belongsTo(City, { foreignKey: 'cityId' });
 
 module.exports = Student;

@@ -31,7 +31,7 @@ function CityForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleCreate = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/cities", {
+      const response = await fetch("http://localhost:8080/api/city", { // Change port to 8080
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,8 +39,9 @@ function CityForm({ open, handleClose, onSubmit, initialData }) {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        const data = await response.json();
         handleClose();
-        onSubmit(formData);
+        onSubmit(data);
       } else {
         throw new Error("Failed to create city");
       }
@@ -52,7 +53,7 @@ function CityForm({ open, handleClose, onSubmit, initialData }) {
   const handleUpdate = async () => {
     try {
       const response = await fetch(
-        `http://localhost:3000/api/cities/${initialData.id}`,
+        `http://localhost:8080/api/city/${initialData.id}`, // Change port to 8080
         {
           method: "PUT",
           headers: {
@@ -62,8 +63,10 @@ function CityForm({ open, handleClose, onSubmit, initialData }) {
         }
       );
       if (response.ok) {
+        window.location.reload(); // Reload the page
         handleClose();
-        onSubmit(formData);
+        onSubmit(data);
+        const data = await response.json();
       } else {
         throw new Error("Failed to update city");
       }

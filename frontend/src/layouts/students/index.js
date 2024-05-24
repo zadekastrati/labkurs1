@@ -8,22 +8,22 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/students/DataTable"; // Adjusted path for student data table
+import DataTable from "layouts/students/DataTable";
 import { Link } from "react-router-dom";
-import StudentForm from "layouts/students/form"; // Adjusted path for student form
+import StudentForm from "layouts/students/form";
 
 function Students() {
-  const [studentData, setStudentData] = useState([]);
+  const [studentData, setstudentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteStudentId, setDeleteStudentId] = useState(null);
+  const [deletestudentId, setDeletestudentId] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
   const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
-  const [selectedStudent, setSelectedStudent] = useState(null); // State to store selected student for update
+  const [selectedstudent, setSelectedstudent] = useState(null); // State to store selected student for update
 
   const handleOpenDeleteModal = (studentId) => {
-    setDeleteStudentId(studentId);
+    setDeletestudentId(studentId);
     setOpenDeleteModal(true);
   };
 
@@ -31,14 +31,14 @@ function Students() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteStudent = async (studentId) => {
+  const handleDeletestudent = async (studentId) => {
     try {
       const response = await fetch(`http://localhost:8080/api/students/${studentId}`, {
         method: "DELETE",
       });
       if (response.ok) {
         // Filter out the deleted student from the studentData state
-        setStudentData((prevData) => prevData.filter((item) => item.id !== studentId));
+        setstudentData((prevData) => prevData.filter((item) => item.id !== studentId));
         handleCloseDeleteModal(); // Close the delete modal after successful deletion
       } else {
         throw new Error("Failed to delete student");
@@ -56,7 +56,7 @@ function Students() {
     setOpenCreateModal(false);
   };
 
-  const handleCreateStudent = async (studentData) => {
+  const handleCreatestudent = async (studentData) => {
     // Handle creating student logic here
     console.log("Create student data:", studentData);
     handleCloseCreateModal();
@@ -64,7 +64,7 @@ function Students() {
   };
 
   const handleOpenUpdateModal = (student) => {
-    setSelectedStudent(student);
+    setSelectedstudent(student);
     setOpenUpdateModal(true);
   };
 
@@ -72,7 +72,7 @@ function Students() {
     setOpenUpdateModal(false);
   };
 
-  const handleUpdateStudent = async (studentId, studentData) => {
+  const handleUpdatestudent = async (studentId, studentData) => {
     // Handle updating student logic here
     console.log("Update student data:", studentData);
     handleCloseUpdateModal();
@@ -86,12 +86,15 @@ function Students() {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      // Update studentData state with the new data
+      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
-        name: item.name,
-        age: item.age,
-        class: item.class,
+        student: <Author firstName={item.firstName} lastName={item.lastName} />,
+        city: (
+          <MDBox ml={2}>
+            <MDBadge badgeContent={item.city.name} color="info" variant="gradient" size="sm" />
+          </MDBox>
+        ),
         action: (
           <MDBox display="flex" alignItems="center">
             <Button
@@ -115,7 +118,7 @@ function Students() {
           </MDBox>
         ),
       }));
-      setStudentData(formattedData);
+      setstudentData(formattedData);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -125,13 +128,69 @@ function Students() {
   };
 
   useEffect(() => {
-    fetchData();
+    fetch("http://localhost:8080/api/students")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const formattedData = data.map((item) => ({
+          id: item.id,
+          student: <Author firstName={item.firstName} lastName={item.lastName} />,
+          city: (
+            <MDBox ml={2}>
+               <MDBadge badgeContent={item.City.name} />
+            </MDBox> 
+          ),
+          action: (
+            <MDBox display="flex" alignItems="center">
+              <Button
+                component={Link}
+                variant="caption"
+                fontWeight="medium"
+                sx={{ ml: 1 }}
+                onClick={() => handleOpenUpdateModal(item)}
+              >
+                Edit
+              </Button>
+
+              <Button
+                variant="caption"
+                fontWeight="medium"
+                sx={{ ml: 1 }}
+                onClick={() => handleOpenDeleteModal(item.id)}
+              >
+                Delete
+              </Button>
+            </MDBox>
+          ),
+        }));
+        setstudentData(formattedData);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError(error);
+        setIsLoading(false);
+      });
   }, []);
 
+  const Author = ({ firstName, lastName }) => (
+    <MDBox display="flex" alignItems="center" lineHeight={1}>
+      <MDBox lineHeight={1}>
+        <MDTypography display="block" variant="button" fontWeight="medium">
+          {firstName}
+        </MDTypography>
+        <MDTypography variant="caption">{lastName}</MDTypography>
+      </MDBox>
+    </MDBox>
+  );
+
   const columns = [
-    { Header: "Name", accessor: "name", width: "30%", align: "left" },
-    { Header: "Age", accessor: "age", align: "left" },
-    { Header: "Class", accessor: "class", align: "left" },
+    { Header: "Student", accessor: "student", width: "45%", align: "left" },
+    { Header: "City", accessor: "city", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
@@ -187,29 +246,28 @@ function Students() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
-          <Button onClick={() => handleDeleteStudent(deleteStudentId)} color="error">
+          <Button onClick={() => handleDeletestudent(deletestudentId)} color="error">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Create Student Modal */}
+      {/* Create student Modal */}
       <StudentForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={handleCreateStudent}
+        onSubmit={handleCreatestudent}
       />
 
-      {/* Update Student Modal */}
+      {/* Update student Modal */}
       <StudentForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(studentData) => handleUpdateStudent(selectedStudent.id, studentData)}
-        initialData={selectedStudent}
+        onSubmit={(studentData) => handleUpdatestudent(selectedstudent.id, studentData)}
+        initialData={selectedstudent}
       />
     </DashboardLayout>
   );
 }
 
 export default Students;
-

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import Icon from '@mui/material/Icon';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -141,28 +142,34 @@ function Users() {
           user: <Author name={item.name} email={item.email} />,
           role: (
             <MDBox ml={2}>
-              <MDBadge badgeContent={item.Role.title} color="info" variant="gradient" size="sm" />
+              <MDBadge badgeContent={item.Role.title} />
             </MDBox>
           ),
           action: (
-            <MDBox display="flex" alignItems="center">
+            <MDBox display="flex" alignItems="center" gap={0.5}>
               <Button
                 component={Link}
                 variant="caption"
                 fontWeight="medium"
-                sx={{ ml: 1 }}
                 onClick={() => handleOpenUpdateModal(item)}
+                sx={{ minWidth: 0, padding: '4px',
+                ':hover': {
+                  color: 'blue', 
+                }}}
               >
-                Edit
+                <Icon fontSize="small">edit</Icon>
               </Button>
 
               <Button
                 variant="caption"
                 fontWeight="medium"
-                sx={{ ml: 1 }}
                 onClick={() => handleOpenDeleteModal(item.id)}
+                sx={{ minWidth: 0, padding: '4px',
+                ':hover': {
+                  color: 'red', 
+                }}}
               >
-                Delete
+                <Icon fontSize="small">delete</Icon>
               </Button>
             </MDBox>
           ),

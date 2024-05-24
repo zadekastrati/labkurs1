@@ -10,7 +10,7 @@ import Course from "layouts/courses";
 import Students from "layouts/students";
 import City from "layouts/city";
 
-// @mui icons
+// @mui icons 
 import Icon from "@mui/material/Icon";
 
 const routes = [
