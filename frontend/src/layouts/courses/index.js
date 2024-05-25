@@ -57,25 +57,6 @@ function Courses() {
     setOpenCreateModal(false);
   };
 
-  const handleCreateCourse = async (courseData) => {
-    try {
-      const response = await fetch("http://localhost:8080/api/courses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(courseData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to create course");
-      }
-      fetchData(); // Refetch data after creating a course
-      handleCloseCreateModal();
-    } catch (error) {
-      console.error("Error creating course:", error);
-    }
-  };
-
   const handleOpenUpdateModal = (course) => {
     setSelectedCourse(course);
     setOpenUpdateModal(true);
@@ -116,7 +97,7 @@ function Courses() {
         course: <Author name={item.title} description={item.description} />,
         category: (
           <MDBox ml={2}>
-            <MDBadge badgeContent={item.Category.title} color="info" variant="gradient" size="sm" />
+            <MDBadge badgeContent={item.Category.name} />
           </MDBox>
         ),
         action: (
@@ -150,7 +131,6 @@ function Courses() {
     }
   };
 
-
   const fetchCategories = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/categories");
@@ -178,7 +158,7 @@ function Courses() {
           course: <Author name={item.title} description={item.description} />,
           category: (
             <MDBox ml={2}>
-              <MDBadge badgeContent={item.Category.title} color="info" variant="gradient" size="sm" />
+              <MDBadge badgeContent={item.Category.name}/>
             </MDBox>
           ),
           action: (
@@ -293,7 +273,7 @@ function Courses() {
       <CourseForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={handleCreateCourse}
+        onSubmit={fetchData} // Directly fetch data after creation
         categories={categories} // Pass categories to CourseForm
       />
 

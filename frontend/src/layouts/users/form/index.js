@@ -92,7 +92,6 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
     } else {
       await handleCreateUser();
     }
-    // Refetch data after creating/updating user
     fetchRoles();
     handleClose();
   };
