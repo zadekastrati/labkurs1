@@ -53,45 +53,45 @@ function StudentForm({ open, handleClose, onSubmit, initialData }) {
     }));
   };
 
-  const handleCreateStudent = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/students", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        handleClose();
-        onSubmit(formData);
-      } else {
-        throw new Error("Failed to create Student");
+    const handleCreateStudent = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/students", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        if (response.ok) {
+          handleClose();
+          onSubmit(formData);
+        } else {
+          throw new Error("Failed to create Student");
+        }
+      } catch (error) {
+        console.error("Error creating Student:", error);
       }
-    } catch (error) {
-      console.error("Error creating Student:", error);
-    }
-  };
+    };
 
-  const handleUpdateStudent = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/students/${initialData.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        handleClose();
-        onSubmit(formData);
-      } else {
-        throw new Error("Failed to update Student");
+    const handleUpdateStudent = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/students/${initialData.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        if (response.ok) {
+          handleClose();
+          onSubmit(formData);
+        } else {
+          throw new Error("Failed to update Student");
+        }
+      } catch (error) {
+        console.error("Error updating Student:", error);
       }
-    } catch (error) {
-      console.error("Error updating Student:", error);
-    }
-  };
+    };
 
   const handleSubmit = async () => {
     if (initialData) {

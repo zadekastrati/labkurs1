@@ -92,7 +92,7 @@ function Students() {
         student: <Author firstName={item.firstName} lastName={item.lastName} />,
         city: (
           <MDBox ml={2}>
-            <MDBadge badgeContent={item.city.name} color="info" variant="gradient" size="sm" />
+            <MDBadge badgeContent={item.City.name} />
           </MDBox>
         ),
         action: (

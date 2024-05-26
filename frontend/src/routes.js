@@ -3,15 +3,15 @@ import Dashboard from "layouts/dashboard";
 import Users from "layouts/users";
 import Roles from "layouts/roles";
 import Trainers from "layouts/trainers";
-import Notifications from "layouts/notifications";
-import Profile from "layouts/profile";
-import SignIn from "layouts/authentication/sign-in";
 import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
 import City from "layouts/city";
-// @mui icons 
+// @mui icons
 import Icon from "@mui/material/Icon";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import { faGears } from '@fortawesome/free-solid-svg-icons';
 
 const routes = [
   {
@@ -21,12 +21,12 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },  
+  },
   {
     type: "collapse",
     name: "Users",
     key: "users",
-    icon: <Icon fontSize="small">persons</Icon>,
+    icon: <FontAwesomeIcon icon={faCircleUser} />,
     route: "/users",
     component: <Users />,
   },
@@ -34,7 +34,7 @@ const routes = [
     type: "collapse",
     name: "Roles",
     key: "roles",
-    icon: <Icon fontSize="small">persons</Icon>,
+    icon: <FontAwesomeIcon icon={faGears} />,
     route: "/roles",
     component: <Roles />,
   },
@@ -64,14 +64,6 @@ const routes = [
   },
   {
     type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <Icon fontSize="small">person</Icon>,
-    route: "/profile",
-    component: <Profile />,
-  },
-  {
-    type: "collapse",
     name: "Students",
     key: "students",
     icon: <Icon fontSize="small">person</Icon>,
@@ -85,24 +77,6 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/city",
     component: <City />,
-  },
-  
-
-  {
-    type: "collapse",
-    name: "Notifications",
-    key: "notifications",
-    icon: <Icon fontSize="small">notifications</Icon>,
-    route: "/notifications",
-    component: <Notifications />,
-  },
-  {
-    type: "collapse",
-    name: "Sign In",
-    key: "sign-in",
-    icon: <Icon fontSize="small">login</Icon>,
-    route: "/authentication/sign-in",
-    component: <SignIn />,
   },
 ];
 
