@@ -9,21 +9,20 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/roles/DataTable";
 import { Link } from "react-router-dom";
-import RoleForm from "layouts/roles/form";
-import Icon from '@mui/material/Icon';
+import CityForm from "layouts/city/form";
 
-function Roles() {
-  const [roleData, setRoleData] = useState([]);
+function City() {
+  const [cityData, setCityData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteRoleId, setDeleteRoleId] = useState(null);
+  const [deleteCityId, setDeleteCityId] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
   const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
-  const [selectedRole, setSelectedRole] = useState(null); // State to store selected role for update
+  const [selectedCity, setSelectedCity] = useState(null); // State to store selected role for update
 
-  const handleOpenDeleteModal = (roleId) => {
-    setDeleteRoleId(roleId);
+  const handleOpenDeleteModal = (cityId) => {
+    setDeleteCityId(cityId);
     setOpenDeleteModal(true);
   };
 
@@ -31,19 +30,19 @@ function Roles() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteRole = async (roleId) => {
+  const handleDeleteCity = async (cityId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/roles/${roleId}`, {
+      const response = await fetch(`http://localhost:8080/api/city/${cityId}`, {
         method: "DELETE",
       });
       if (response.ok) {
         handleCloseDeleteModal();
         fetchData();
       } else {
-        throw new Error("Failed to delete role");
+        throw new Error("Failed to delete city");
       }
     } catch (error) {
-      console.error("Error deleting role:", error);
+      console.error("Error deleting city:", error);
     }
   };
 
@@ -55,15 +54,15 @@ function Roles() {
     setOpenCreateModal(false);
   };
 
-  const handleCreateRole = async (roleData) => {
+  const handleCreateCity = async (cityData) => {
     // Handle creating role logic here
-    console.log("Create role data:", roleData);
+    console.log("Create city data:", cityData);
     handleCloseCreateModal();
     fetchData();
   };
 
-  const handleOpenUpdateModal = (role) => {
-    setSelectedRole(role);
+  const handleOpenUpdateModal = (city) => {
+    setSelectedCity(city);
     setOpenUpdateModal(true);
   };
 
@@ -71,16 +70,16 @@ function Roles() {
     setOpenUpdateModal(false);
   };
 
-  const handleUpdateRole = async (roleId, roleData) => {
+  const handleUpdateCity = async (cityId, cityData) => {
     // Handle updating role logic here
-    console.log("Update role data:", roleData);
+    console.log("Update city data:", cityData);
     handleCloseUpdateModal();
     fetchData();
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/roles");
+      const response = await fetch("http://localhost:8080/api/city");
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -88,43 +87,36 @@ function Roles() {
       // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
-        title: (
+        name: (
           <MDBox display="flex" alignItems="center">
             <MDTypography display="block" variant="button" fontWeight="medium">
-              {item.title}
+              {item.name}
             </MDTypography>
           </MDBox>
         ),
         action: (
           <MDBox display="flex" alignItems="center">
             <Button
-                component={Link}
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenUpdateModal(item)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'blue', 
-                }}}
-              >
-                <Icon fontSize="small">edit</Icon>
-              </Button>
-
-              <Button
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenDeleteModal(item.id)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'red', 
-                }}}
-              >
-                <Icon fontSize="small">delete</Icon>
-              </Button>
+              component={Link}
+              variant="caption"
+              fontWeight="medium"
+              sx={{ ml: 1 }}
+              onClick={() => handleOpenUpdateModal(item)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="caption"
+              fontWeight="medium"
+              sx={{ ml: 1 }}
+              onClick={() => handleOpenDeleteModal(item.id)}
+            >
+              Delete
+            </Button>
           </MDBox>
         ),
       }));
-      setRoleData(formattedData);
+      setCityData(formattedData);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -138,7 +130,7 @@ function Roles() {
   }, []);
 
   const columns = [
-    { Header: "Title", accessor: "title", width: "45%", align: "left" },
+    { Header: "Name", accessor: "name", width: "45%", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
@@ -163,7 +155,7 @@ function Roles() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Roles
+                  City
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -173,7 +165,7 @@ function Roles() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: roleData }}
+                    table={{ columns, rows: cityData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -190,12 +182,12 @@ function Roles() {
       {/* Delete Confirmation Modal */}
       <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <DialogContent>
-          <MDTypography>Are you sure you want to delete this role?</MDTypography>
+          <MDTypography>Are you sure you want to delete this city?</MDTypography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
           <Button
-            onClick={() => handleDeleteRole(deleteRoleId)}
+            onClick={() => handleDeleteCity(deleteCityId)}
             color="primary"
             style={{ color: "#3583eb" }}
           >
@@ -205,21 +197,21 @@ function Roles() {
       </Dialog>
 
       {/* Create Role Modal */}
-      <RoleForm
+      <CityForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={handleCreateRole}
+        onSubmit={handleCreateCity}
       />
 
       {/* Update Role Modal */}
-      <RoleForm
+      <CityForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(roleData) => handleUpdateRole(selectedRole.id, roleData)}
-        initialData={selectedRole}
+        onSubmit={(roleData) => handleUpdateCity(selectedCity.id, cityData)}
+        initialData={selectedCity}
       />
     </DashboardLayout>
   );
 }
 
-export default Roles;
+export default City;

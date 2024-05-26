@@ -8,8 +8,10 @@ import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
 import Course from "layouts/courses";
-
-// @mui icons
+import Categories from "layouts/categories";
+import Students from "layouts/students";
+import City from "layouts/city";
+// @mui icons 
 import Icon from "@mui/material/Icon";
 
 const routes = [
@@ -63,6 +65,14 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Categories",
+    key: "categories",
+    icon: <Icon fontSize="small">category</Icon>,
+    route: "/categories",
+    component: <Categories />,
+  },
+  {
+    type: "collapse",
     name: "Profile",
     key: "profile",
     icon: <Icon fontSize="small">person</Icon>,
@@ -71,13 +81,30 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Students",
+    key: "students",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/students",
+    component: <Students />,
+  },
+  {
+    type: "collapse",
+    name: "City",
+    key: "City",
+    icon: <Icon fontSize="small">person</Icon>,
+    route: "/city",
+    component: <City />,
+  },
+  
+
+  {
+    type: "collapse",
     name: "Notifications",
     key: "notifications",
     icon: <Icon fontSize="small">notifications</Icon>,
     route: "/notifications",
     component: <Notifications />,
   },
-
   {
     type: "collapse",
     name: "Sign In",

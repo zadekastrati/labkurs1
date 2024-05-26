@@ -83,6 +83,11 @@ export default function App() {
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
       </Routes>
+     
+      
+      
+
     </ThemeProvider>
+    
   );
 }

@@ -3,28 +3,27 @@ import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/ma
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
-import MDBadge from "components/MDBadge";
+import MDBadge from "@mui/material/Badge";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/courses/DataTable";
+import DataTable from "layouts/students/DataTable";
 import { Link } from "react-router-dom";
-import CourseForm from "layouts/courses/form";
+import StudentForm from "layouts/students/form";
 
-function Courses() {
-  const [courseData, setCourseData] = useState([]);
-  const [categories, setCategories] = useState([]);
+function Students() {
+  const [studentData, setstudentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteCourseId, setDeleteCourseId] = useState(null);
-  const [openCreateModal, setOpenCreateModal] = useState(false);
-  const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [deletestudentId, setDeletestudentId] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
+  const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
+  const [selectedstudent, setSelectedstudent] = useState(null); // State to store selected student for update
 
-  const handleOpenDeleteModal = (courseId) => {
-    setDeleteCourseId(courseId);
+  const handleOpenDeleteModal = (studentId) => {
+    setDeletestudentId(studentId);
     setOpenDeleteModal(true);
   };
 
@@ -32,24 +31,24 @@ function Courses() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteCourse = async (courseId) => {
+  const handleDeletestudent = async (studentId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
+      const response = await fetch(`http://localhost:8080/api/students/${studentId}`, {
         method: "DELETE",
       });
       if (response.ok) {
-        setCourseData((prevData) => prevData.filter((item) => item.id !== courseId));
-        handleCloseDeleteModal();
+        // Filter out the deleted student from the studentData state
+        setstudentData((prevData) => prevData.filter((item) => item.id !== studentId));
+        handleCloseDeleteModal(); // Close the delete modal after successful deletion
       } else {
-        throw new Error("Failed to delete course");
+        throw new Error("Failed to delete student");
       }
     } catch (error) {
-      console.error("Error deleting course:", error);
+      console.error("Error deleting student:", error);
     }
   };
 
   const handleOpenCreateModal = () => {
-    setSelectedCourse(null);
     setOpenCreateModal(true);
   };
 
@@ -57,8 +56,15 @@ function Courses() {
     setOpenCreateModal(false);
   };
 
-  const handleOpenUpdateModal = (course) => {
-    setSelectedCourse(course);
+  const handleCreatestudent = async (studentData) => {
+    // Handle creating student logic here
+    console.log("Create student data:", studentData);
+    handleCloseCreateModal();
+    fetchData();
+  };
+
+  const handleOpenUpdateModal = (student) => {
+    setSelectedstudent(student);
     setOpenUpdateModal(true);
   };
 
@@ -66,38 +72,27 @@ function Courses() {
     setOpenUpdateModal(false);
   };
 
-  const handleUpdateCourse = async (courseId, courseData) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(courseData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update course");
-      }
-      fetchData(); // Refetch data after updating a course
-      handleCloseUpdateModal();
-    } catch (error) {
-      console.error("Error updating course:", error);
-    }
+  const handleUpdatestudent = async (studentId, studentData) => {
+    // Handle updating student logic here
+    console.log("Update student data:", studentData);
+    handleCloseUpdateModal();
+    fetchData();
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/courses");
+      const response = await fetch("http://localhost:8080/api/students");
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
+      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
-        course: <Author name={item.title} description={item.description} />,
-        category: (
+        student: <Author firstName={item.firstName} lastName={item.lastName} />,
+        city: (
           <MDBox ml={2}>
-            <MDBadge badgeContent={item.Category.name} />
+            <MDBadge badgeContent={item.city.name} color="info" variant="gradient" size="sm" />
           </MDBox>
         ),
         action: (
@@ -111,6 +106,7 @@ function Courses() {
             >
               Edit
             </Button>
+
             <Button
               variant="caption"
               fontWeight="medium"
@@ -122,7 +118,7 @@ function Courses() {
           </MDBox>
         ),
       }));
-      setCourseData(formattedData);
+      setstudentData(formattedData);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -131,21 +127,8 @@ function Courses() {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/categories");
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-  
   useEffect(() => {
-    fetch("http://localhost:8080/api/courses")
+    fetch("http://localhost:8080/api/students")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch data");
@@ -155,11 +138,11 @@ function Courses() {
       .then((data) => {
         const formattedData = data.map((item) => ({
           id: item.id,
-          course: <Author name={item.title} description={item.description} />,
-          category: (
+          student: <Author firstName={item.firstName} lastName={item.lastName} />,
+          city: (
             <MDBox ml={2}>
-              <MDBadge badgeContent={item.Category.name}/>
-            </MDBox>
+               <MDBadge badgeContent={item.City.name} />
+            </MDBox> 
           ),
           action: (
             <MDBox display="flex" alignItems="center">
@@ -184,7 +167,7 @@ function Courses() {
             </MDBox>
           ),
         }));
-        setCourseData(formattedData);
+        setstudentData(formattedData);
         setIsLoading(false);
       })
       .catch((error) => {
@@ -194,20 +177,20 @@ function Courses() {
       });
   }, []);
 
-  const Author = ({ name, description }) => (
+  const Author = ({ firstName, lastName }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDBox lineHeight={1}>
         <MDTypography display="block" variant="button" fontWeight="medium">
-          {name}
+          {firstName}
         </MDTypography>
-        <MDTypography variant="caption">{description}</MDTypography>
+        <MDTypography variant="caption">{lastName}</MDTypography>
       </MDBox>
     </MDBox>
   );
 
   const columns = [
-    { Header: "course", accessor: "course", width: "45%", align: "left" },
-    { Header: "category", accessor: "category", align: "left" },
+    { Header: "Student", accessor: "student", width: "45%", align: "left" },
+    { Header: "City", accessor: "city", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
@@ -232,7 +215,7 @@ function Courses() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Courses
+                  Students
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -242,7 +225,7 @@ function Courses() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: courseData }}
+                    table={{ columns, rows: studentData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -259,34 +242,32 @@ function Courses() {
       {/* Delete Confirmation Modal */}
       <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <DialogContent>
-          <MDTypography>Are you sure you want to delete this course?</MDTypography>
+          <MDTypography>Are you sure you want to delete this student?</MDTypography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
-          <Button onClick={() => handleDeleteCourse(deleteCourseId)} color="error">
+          <Button onClick={() => handleDeletestudent(deletestudentId)} color="error">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Create course Modal */}
-      <CourseForm
+      {/* Create student Modal */}
+      <StudentForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={fetchData} // Directly fetch data after creation
-        categories={categories} // Pass categories to CourseForm
+        onSubmit={handleCreatestudent}
       />
 
-      {/* Update course Modal */}
-      <CourseForm
+      {/* Update student Modal */}
+      <StudentForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(courseData) => handleUpdateCourse(selectedCourse.id, courseData)}
-        initialData={selectedCourse}
-        categories={categories} // Pass categories to CourseForm
+        onSubmit={(studentData) => handleUpdatestudent(selectedstudent.id, studentData)}
+        initialData={selectedstudent}
       />
     </DashboardLayout>
   );
 }
 
-export default Courses;
+export default Students;

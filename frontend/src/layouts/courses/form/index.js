@@ -7,27 +7,26 @@ import {
   DialogActions,
   Button,
   TextField,
-  MenuItem,
-} from "@mui/material";
+  } from "@mui/material";
 
-function UserForm({ open, handleClose, onSubmit, initialData }) {
+function CourseForm({ open, handleClose, onSubmit, initialData }) {
   const [selectedOption] = useState(null);
   const [formData, setFormData] = useState(
-    initialData || { name: "", email: "", password: "", role: "" }
+    initialData || { title: "", description: "", category: "" }
   );
-  const [roles, setRoles] = useState([]);
-  const rolesArray = [];
-  roles.forEach((role) => {
-    rolesArray.push({ value: role.id, label: role.title });
+  const [categories, setCategories] = useState([]);
+  const categoriesArray = [];
+  categories.forEach((category) => {
+    categoriesArray.push({ value: category.id, label: category.name });
   });
 
   useEffect(() => {
     if (!initialData && open) {
-      setFormData({ name: "", email: "", password: "", role: "" });
+      setFormData({ title: "", description: "", category: "" });
     } else if (initialData) {
       setFormData(initialData);
     }
-    fetchRoles();
+    fetchCategories();
   }, [open, initialData]);
 
   const handleChange = (e) => {
@@ -38,17 +37,17 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
     }));
   };
 
-  const handleRoleChange = (e) => {
+  const handleCategoryChange = (e) => {
     const value = e.value;
     setFormData((prevData) => ({
       ...prevData,
-      roleId: value,
+      categoryId: value,
     }));
   };
 
-  const handleCreateUser = async () => {
+  const handleCreateCourse = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/users", {
+      const response = await fetch("http://localhost:8080/api/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -59,16 +58,16 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
         handleClose();
         onSubmit(formData);
       } else {
-        throw new Error("Failed to create user");
+        throw new Error("Failed to create course");
       }
     } catch (error) {
-      console.error("Error creating user:", error);
+      console.error("Error creating course:", error);
     }
   };
 
-  const handleUpdateUser = async () => {
+  const handleUpdateCourse = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${initialData.id}`, {
+      const response = await fetch(`http://localhost:8080/api/courses/${initialData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -79,40 +78,40 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
         handleClose();
         onSubmit(formData);
       } else {
-        throw new Error("Failed to update user");
+        throw new Error("Failed to update course");
       }
     } catch (error) {
-      console.error("Error updating user:", error);
+      console.error("Error updating course:", error);
     }
   };
 
   const handleSubmit = async () => {
     if (initialData) {
-      await handleUpdateUser();
+      await handleUpdateCourse();
     } else {
-      await handleCreateUser();
+      await handleCreateCourse();
     }
-    fetchRoles();
+    fetchCategories();
     handleClose();
   };
 
-  const fetchRoles = async () => {
+  const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/roles");
+      const response = await fetch("http://localhost:8080/api/categories");
       if (response.ok) {
         const data = await response.json();
-        setRoles(data); // Assuming roles are stored in the database with properties: id and title
+        setCategories(data);
       } else {
-        throw new Error("Failed to fetch roles");
+        throw new Error("Failed to fetch categories");
       }
     } catch (error) {
-      console.error("Error fetching roles:", error);
+      console.error("Error fetching categories:", error);
     }
   };
 
   return (
     <Dialog
-      id='usersModal'
+      id='coursesModal'
       open={open}
       onClose={handleClose}
       fullWidth={true}
@@ -126,44 +125,35 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
         },
       }}
     >
-      <DialogTitle>{initialData ? "Edit User" : "Create User"}</DialogTitle>
+      <DialogTitle>{initialData ? "Edit Course" : "Create Course"}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
-          name="name"
+          name="title"
           label="Name"
           fullWidth
-          value={formData.name}
+          value={formData.title}
           onChange={handleChange}
         />
         <TextField
           margin="dense"
-          name="email"
-          label="Email"
+          name="description"
+          label="Description"
           fullWidth
-          value={formData.email}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          name="password"
-          label="Password"
-          type="password"
-          fullWidth
-          value={formData.password}
+          value={formData.description}
           onChange={handleChange}
         />
         <div className="App">
           <Select
             margin="dense"
-            name="roleId"
-            label="Role"
+            name="categoryId"
+            label="Category"
             fullWidth
             defaultValue={selectedOption}
-            onChange={handleRoleChange}
-            options={rolesArray}
-            menuPortalTarget={document.getElementById('usersModal')}
+            onChange={handleCategoryChange}
+            options={categoriesArray}
+            menuPortalTarget={document.getElementById('coursesModal')}
           />
         </div>
       </DialogContent>
@@ -179,4 +169,4 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
   );
 }
 
-export default UserForm;
+export default CourseForm;
