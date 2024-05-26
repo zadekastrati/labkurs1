@@ -4,15 +4,17 @@ const Trainer = require("../models/trainer.model.js");
 async function createTrainer(req, res) {
   try {
     const { trainersName, specialization } = req.body;
-    const trainer = await Trainer.create({ trainersName, specialization });
-    res.status(201).json(trainer);
+
+    const trainers = await Trainer.create({ trainersName, specialization });
+
+    res.status(201).json(trainers);
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
 }
 exports.createTrainer = createTrainer;
 
-// Retrieve all
+// Retrieve all trainers
 async function getAllTrainers(req, res) {
   try {
     const trainers = await Trainer.findAll();

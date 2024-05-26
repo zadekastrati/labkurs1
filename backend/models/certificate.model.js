@@ -1,44 +1,44 @@
-const { DataTypes } = require('sequelize');
-const db = require('../config/db.config.js');
+const { DataTypes } = require("sequelize");
+const db = require("../config/db.config.js");
+const Trainer = require("./trainer.model.js");
 
-const Certificate = db.define('Certificate', {
+const Certificate = db.define("Certificate", {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
   },
-  
-  title: {
+  trainerId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+
+  trainersName: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
   },
-
   studentsName: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING,
     allowNull: false,
   },
-  courseType:{
-    type: DataTypes.STRING(255),
+  courseType: {
+    type: DataTypes.STRING,
     allowNull: false,
   },
-
   date: {
     type: DataTypes.DATE,
-    allowNull: false
   },
-
   createdAt: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: DataTypes.NOW
+    defaultValue: DataTypes.NOW,
   },
-
   updatedAt: {
     type: DataTypes.DATE,
     allowNull: false,
-    defaultValue: DataTypes.NOW
-  }
+    defaultValue: DataTypes.NOW,
+  },
 });
-
+Certificate.belongsTo(Trainer, { foreignKey: "trainerId" });
 module.exports = Certificate;

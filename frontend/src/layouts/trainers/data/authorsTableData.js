@@ -1,23 +1,17 @@
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
-import MDAvatar from "components/MDAvatar";
 import MDBadge from "components/MDBadge";
 
-// Images
-import team2 from "assets/images/team-2.jpg";
-import team3 from "assets/images/team-3.jpg";
-import team4 from "assets/images/team-4.jpg";
 
 export default function data() {
-  const Author = ({ image, name, specialization }) => (
+  const Author = ({ trainersName }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
-      {/* <MDAvatar src={image} name={name} size="sm" /> */}
+      {/* <MDAvatar src={image} trainersName={trainersName} size="sm" /> */}
       <MDBox lineHeight={1}>
         <MDTypography display="block" variant="button" fontWeight="medium">
-          {name}
+          {trainersName}
         </MDTypography>
-        <MDTypography variant="caption">{specialization}</MDTypography>
       </MDBox>
     </MDBox>
   );
@@ -30,10 +24,10 @@ export default function data() {
     ],
     rows: [
       {
-        trainer: <Author image={team2} name="John Legend" specialization="Frontend" />,
-        specialization: (
+        trainer: <Author trainersName="John Michael" specialization="john@creative-tim.com" />,
+        role: (
           <MDBox ml={-1}>
-            <MDBadge badgeContent="professor" color="success" variant="gradient" size="sm" />
+            <MDBadge badgeContent="trainer" color="success" variant="gradient" size="sm" />
           </MDBox>
         ),
         action: (
@@ -55,8 +49,13 @@ export default function data() {
         ),
       },
       {
-        trainer: <Author image={team2} name="John Michael" specialization="full stack" />,
-        specialization: (
+        trainer: (
+          <Author
+            trainersName="John Michael"
+            specialization="john@creative-tim.com"
+          />
+        ),
+        role: (
           <MDBox ml={-1}>
             <MDBadge badgeContent="student" color="success" variant="gradient" size="sm" />
           </MDBox>

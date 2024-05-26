@@ -3,6 +3,7 @@ import Dashboard from "layouts/dashboard";
 import Users from "layouts/users";
 import Roles from "layouts/roles";
 import Trainers from "layouts/trainers";
+import Certificates from "layouts/certificates";
 import Notifications from "layouts/notifications";
 import Profile from "layouts/profile";
 import SignIn from "layouts/authentication/sign-in";
@@ -12,7 +13,6 @@ import Course from "layouts/courses";
 import Icon from "@mui/material/Icon";
 
 const routes = [
-
   {
     type: "collapse",
     name: "Dashboard",
@@ -20,7 +20,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },  
+  },
   {
     type: "collapse",
     name: "Users",
@@ -47,12 +47,20 @@ const routes = [
   },
   {
     type: "collapse",
+    name: "Certificates",
+    key: "certificates",
+    icon: <Icon fontSize="small">book</Icon>,
+    route: "/certificates",
+    component: <Certificates />,
+  },
+  {
+    type: "collapse",
     name: "Courses",
     key: "courses",
     icon: <Icon fontSize="small">school</Icon>,
     route: "/courses",
     component: <Course />,
-  }, 
+  },
   {
     type: "collapse",
     name: "Profile",
@@ -69,7 +77,7 @@ const routes = [
     route: "/notifications",
     component: <Notifications />,
   },
- 
+
   {
     type: "collapse",
     name: "Sign In",
