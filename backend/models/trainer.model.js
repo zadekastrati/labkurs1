@@ -26,7 +26,6 @@ const Trainer = db.define("Trainer", {
     allowNull: false,
     defaultValue: DataTypes.NOW,
   },
-
 });
 
 module.exports = Trainer;

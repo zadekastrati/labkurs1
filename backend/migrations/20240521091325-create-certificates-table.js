@@ -9,7 +9,17 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true,
       },
-      title: {
+      trainerId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: "trainers", // Name of the table that has the foreign key
+          key: "id", // Key in the foreign table that we're referencing
+        },
+        onUpdate: "CASCADE",
+        onDelete: "CASCADE",
+      },
+      trainersName: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -25,7 +35,6 @@ module.exports = {
 
       date: {
         type: Sequelize.DATE,
-        allowNull: false,
       },
 
       createdAt: {

@@ -3,6 +3,7 @@ import Dashboard from "layouts/dashboard";
 import Users from "layouts/users";
 import Roles from "layouts/roles";
 import Trainers from "layouts/trainers";
+import Certificates from "layouts/certificates";
 import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
@@ -21,7 +22,7 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },
+  },  
   {
     type: "collapse",
     name: "Users",
@@ -45,6 +46,14 @@ const routes = [
     icon: <Icon fontSize="small">book</Icon>,
     route: "/trainers",
     component: <Trainers />,
+  },
+  {
+    type: "collapse",
+    name: "Certificates",
+    key: "certificates",
+    icon: <Icon fontSize="small">book</Icon>,
+    route: "/certificates",
+    component: <Certificates />,
   },
   {
     type: "collapse",
