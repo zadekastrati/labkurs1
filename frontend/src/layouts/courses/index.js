@@ -11,6 +11,8 @@ import Footer from "examples/Footer";
 import DataTable from "layouts/courses/DataTable";
 import { Link } from "react-router-dom";
 import CourseForm from "layouts/courses/form";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function Courses() {
   const [courseData, setCourseData] = useState([]);
@@ -102,23 +104,14 @@ function Courses() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <Button
-              component={Link}
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
+            <EditIcon
               onClick={() => handleOpenUpdateModal(item)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
+              style={{ cursor: "pointer", marginRight: "24px", fontSize: "2.5rem" }}
+            />
+            <DeleteIcon
               onClick={() => handleOpenDeleteModal(item.id)}
-            >
-              Delete
-            </Button>
+              style={{ cursor: "pointer", fontSize: "2.5rem" }}
+            />
           </MDBox>
         ),
       }));
@@ -143,7 +136,7 @@ function Courses() {
       console.error("Error fetching categories:", error);
     }
   };
-  
+
   useEffect(() => {
     fetch("http://localhost:8080/api/courses")
       .then((response) => {
@@ -163,24 +156,14 @@ function Courses() {
           ),
           action: (
             <MDBox display="flex" alignItems="center">
-              <Button
-                component={Link}
-                variant="caption"
-                fontWeight="medium"
-                sx={{ ml: 1 }}
+              <EditIcon
                 onClick={() => handleOpenUpdateModal(item)}
-              >
-                Edit
-              </Button>
-
-              <Button
-                variant="caption"
-                fontWeight="medium"
-                sx={{ ml: 1 }}
+                style={{ cursor: "pointer", marginRight: "24px", fontSize: "2.5rem" }}
+              />
+              <DeleteIcon
                 onClick={() => handleOpenDeleteModal(item.id)}
-              >
-                Delete
-              </Button>
+                style={{ cursor: "pointer", fontSize: "2.5rem" }}
+              />
             </MDBox>
           ),
         }));

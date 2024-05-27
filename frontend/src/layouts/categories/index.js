@@ -7,6 +7,8 @@ import {
   Button,
   DialogTitle,
 } from "@mui/material";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -142,28 +144,15 @@ function Categories() {
     ),
     action: (
       <MDBox display="flex" alignItems="center">
-        <MDTypography
-          component="a"
-          href="#"
-          variant="caption"
-          color="text"
-          fontWeight="medium"
-          onClick={() => handleOpenEditModal(category)}
-        >
-          Edit
-        </MDTypography>
-        &nbsp;|&nbsp;
-        <MDTypography
-          component="a"
-          href="#"
-          variant="caption"
-          color="text"
-          fontWeight="medium"
-          onClick={() => handleOpenDeleteDialog(category)}
-        >
-          Delete
-        </MDTypography>
-      </MDBox>
+        <EditIcon 
+        onClick={()=>handleOpenEditModal(category)}
+        style={{cursor:"pointer",marginRight: "30px", fontSize: "5.5rem" }}
+        />
+        <DeleteIcon
+        onClick={()=> handleOpenDeleteDialog(category)}
+        style={{cursor:"pointer", fontSize: "1.5rem"}}
+        />
+        </MDBox>
     ),
   }));
 
