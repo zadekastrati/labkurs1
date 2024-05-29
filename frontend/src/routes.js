@@ -8,6 +8,7 @@ import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
 import City from "layouts/city";
+import  Assignments from 'layouts/assignments';
 // @mui icons
 import Icon from "@mui/material/Icon";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -86,6 +87,14 @@ const routes = [
     icon: <Icon fontSize="small">person</Icon>,
     route: "/city",
     component: <City />,
+  },
+  {
+    type:"collapse",
+    name:"Assignments",
+    key:"assignments",
+    icon:<Icon fontSize="small">assignment</Icon>,
+    route:"/assignments",
+    component:<Assignments/>,
   },
 ];
 

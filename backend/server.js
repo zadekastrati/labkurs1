@@ -9,6 +9,8 @@ const certificateRoutes = require("./routes/certificate.routes.js");
 const studentsRoutes = require("./routes/students.routes.js");
 const categoriesRoutes = require("./routes/categories.routes.js");
 const cityRoutes = require("./routes/city.routes.js");
+const AssignmentRoutes = require("./routes/assignments.routes.js");
+
 
 // Initialize Express app
 const app = express();
@@ -36,6 +38,7 @@ app.use("/api/certificates", certificateRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/city", cityRoutes);
+app.use("/api/assignment", AssignmentRoutes);
 
 // Set up a basic route
 app.get("/", (req, res) => {
