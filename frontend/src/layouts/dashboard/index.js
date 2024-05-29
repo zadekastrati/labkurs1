@@ -11,10 +11,12 @@ Coded by www.creative-tim.com
  =========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/
+*/import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 // @mui material components
 import Grid from "@mui/material/Grid";
+
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -34,9 +36,78 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
+import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
+   // State to store the counts
+   const [counts, setCounts] = useState({
+    courses: 0,
+    trainers: 0,
+    students: 0,
+    users: 0
+  });
+
+  const fetchCounts = () => {
+    axios.get('http://localhost:3000/api/counts')
+      .then(response => {
+        setCounts(response.data);
+      })
+      .catch(error => {
+        console.error('There was an error fetching the counts!', error);
+      });
+  };
+
+  useEffect(() => {
+    fetchCounts();
+  }, []);
+
+  // Example function to handle adding a course
+  const addCourse = (courseData) => {
+    axios.post('http://localhost:3000/api/courses', courseData)
+      .then(response => {
+        console.log(response.data.message);
+        fetchCounts();  // Fetch counts after adding a course
+      })
+      .catch(error => {
+        console.error('There was an error adding the course!', error);
+      });
+  };
+
+  // Similar functions for adding trainers, students, and users
+  const addTrainer = (trainerData) => {
+    axios.post('http://localhost:3000/api/trainers', trainerData)
+      .then(response => {
+        console.log(response.data.message);
+        fetchCounts();
+      })
+      .catch(error => {
+        console.error('There was an error adding the trainer!', error);
+      });
+  };
+
+  const addStudent = (studentData) => {
+    axios.post('http://localhost:3000/api/students', studentData)
+      .then(response => {
+        console.log(response.data.message);
+        fetchCounts();
+      })
+      .catch(error => {
+        console.error('There was an error adding the student!', error);
+      });
+  };
+
+  const addUser = (userData) => {
+    axios.post('http://localhost:3000/api/users', userData)
+      .then(response => {
+        console.log(response.data.message);
+        fetchCounts();
+      })
+      .catch(error => {
+        console.error('There was an error adding the user!', error);
+      });
+  };
+
 
   return (
     <DashboardLayout>
@@ -47,28 +118,20 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="dark"
-                icon="weekend"
-                title="Bookings"
-                count={281}
-                percentage={{
-                  color: "success",
-                  amount: "+55%",
-                  label: "than lask week",
-                }}
+                icon="school"
+                title="Courses"
+                count={counts.courses}
+                percentage={{ color: 'success' }}
               />
             </MDBox>
           </Grid>
           <Grid item xs={12} md={6} lg={3}>
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
-                icon="leaderboard"
-                title="Today's Users"
-                count="2,300"
-                percentage={{
-                  color: "success",
-                  amount: "+3%",
-                  label: "than last month",
-                }}
+                icon="book"
+                title="Trainers"
+                count={counts.trainers}
+                percentage={{ color: 'success' }}
               />
             </MDBox>
           </Grid>
@@ -76,14 +139,10 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="success"
-                icon="store"
-                title="Revenue"
-                count="34k"
-                percentage={{
-                  color: "success",
-                  amount: "+1%",
-                  label: "than yesterday",
-                }}
+                icon="person"
+                title="Students"
+                count={counts.students}
+                percentage={{ color: 'success' }}
               />
             </MDBox>
           </Grid>
@@ -91,14 +150,11 @@ function Dashboard() {
             <MDBox mb={1.5}>
               <ComplexStatisticsCard
                 color="primary"
-                icon="person_add"
-                title="Followers"
-                count="+91"
-                percentage={{
-                  color: "success",
-                  amount: "",
-                  label: "Just updated",
-                }}
+                icon="person"
+                title="All Users"
+                count={counts.users}
+                percentage={{ color: 'success' }}
+             
               />
             </MDBox>
           </Grid>
