@@ -49,7 +49,7 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleCreateAssignment = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/assignments", {
+      const response = await fetch("http://localhost:8080/api/assignment", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,7 +69,7 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleUpdateAssignment = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/assignments/${initialData.id}`, {
+      const response = await fetch(`http://localhost:8080/api/assignment/${initialData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -93,7 +93,8 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
     } else {
       await handleCreateAssignment();
     }
-    // handleClose();
+    fetchCourses();
+    handleClose();
   };
 
   const fetchCourses = async () => {

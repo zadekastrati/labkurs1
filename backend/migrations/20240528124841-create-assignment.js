@@ -43,4 +43,6 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('assignment');
   }
+  // npx sequelize-cli migration:generate --name create-assignments
+
 }
