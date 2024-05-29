@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import Icon from '@mui/material/Icon';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
-import MDBadge from "components/MDBadge";
+import MDBadge from "@mui/material/Badge";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/courses/DataTable";
+import DataTable from "layouts/assignments/DataTable";
 import { Link } from "react-router-dom";
 import AssignmentForm from "layouts/assignments/form";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-function Assignments() {
+function Assignment() {
   const [assignmentData, setAssignmentData] = useState([]);
-  const [courses, setCourses] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteAssignmentId, setDeleteAssignmentId] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false);
-  const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false); 
+  const [selectedAssignment, setSelectedAssignment] = useState(null); 
 
   const handleOpenDeleteModal = (assignmentId) => {
     setDeleteAssignmentId(assignmentId);
@@ -36,12 +36,12 @@ function Assignments() {
 
   const handleDeleteAssignment = async (assignmentId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/assignments/${assignmentId}`, {
+      const response = await fetch(`http://localhost:8080/api/assignment/${assignmentId}`, {
         method: "DELETE",
       });
       if (response.ok) {
         setAssignmentData((prevData) => prevData.filter((item) => item.id !== assignmentId));
-        handleCloseDeleteModal();
+        handleCloseDeleteModal(); 
       } else {
         throw new Error("Failed to delete assignment");
       }
@@ -51,12 +51,17 @@ function Assignments() {
   };
 
   const handleOpenCreateModal = () => {
-    setSelectedAssignment(null);
     setOpenCreateModal(true);
   };
 
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
+  };
+
+  const handleCreateAssignment = async (assignmentData) => {
+    console.log("Create assignment data:", assignmentData);
+    handleCloseCreateModal();
+    fetchData();
   };
 
   const handleOpenUpdateModal = (assignment) => {
@@ -69,22 +74,9 @@ function Assignments() {
   };
 
   const handleUpdateAssignment = async (assignmentId, assignmentData) => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/assignments/${assignmentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(assignmentData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update assignment");
-      }
-      fetchData(); // Refetch data after updating an assignment
-      handleCloseUpdateModal();
-    } catch (error) {
-      console.error("Error updating assignment:", error);
-    }
+    console.log("Update assignment data:", assignmentData);
+    handleCloseUpdateModal();
+    fetchData();
   };
 
   const fetchData = async () => {
@@ -104,14 +96,16 @@ function Assignments() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <EditIcon
-              onClick={() => handleOpenUpdateModal(item)}
-              style={{ cursor: "pointer", marginRight: "24px", fontSize: "2.5rem" }}
-            />
-            <DeleteIcon
-              onClick={() => handleOpenDeleteModal(item.id)}
-              style={{ cursor: "pointer", fontSize: "2.5rem" }}
-            />
+            <MDBox display="flex" alignItems="center">
+              <EditIcon
+                onClick={() => handleOpenUpdateModal(item)}
+                style={{ cursor: "pointer", marginRight: "24px", fontSize: "small" }}
+              />
+              <DeleteIcon
+                onClick={() => handleOpenDeleteModal(item.id)}
+                style={{ cursor: "pointer", fontSize: "small" }}
+              />
+            </MDBox>
           </MDBox>
         ),
       }));
@@ -124,22 +118,60 @@ function Assignments() {
     }
   };
 
-  const fetchCourses = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/courses");
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setCourses(data);
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchData();
-    fetchCourses();
+    fetch("http://localhost:8080/api/assignment")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        const formattedData = data.map((item) => ({
+          id: item.id,
+          assignment: <Author name={item.name} description={item.description} />,
+          course: (
+            <MDBox ml={2}>
+              <MDBadge badgeContent={item.Course.title} />
+            </MDBox>
+          ),
+          action: (
+            <MDBox display="flex" alignItems="center" gap={0.5}>
+              <Button
+                component={Link}
+                variant="caption"
+                fontWeight="medium"
+                onClick={() => handleOpenUpdateModal(item)}
+                sx={{ minWidth: 0, padding: '4px',
+                ':hover': {
+                  color: 'blue', 
+                }}}
+              >
+                <Icon fontSize="small">edit</Icon>
+              </Button>
+
+              <Button
+                variant="caption"
+                fontWeight="medium"
+                onClick={() => handleOpenDeleteModal(item.id)}
+                sx={{ minWidth: 0, padding: '4px',
+                ':hover': {
+                  color: 'red', 
+                }}}
+              >
+                <Icon fontSize="small">delete</Icon>
+              </Button>
+            </MDBox>
+          ),
+        }));
+        setAssignmentData(formattedData);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setError(error);
+        setIsLoading(false);
+      });
   }, []);
 
   const Author = ({ name, description }) => (
@@ -217,24 +249,22 @@ function Assignments() {
         </DialogActions>
       </Dialog>
 
-      {/* Create assignment Modal */}
+      {/* Create Assignment Modal */}
       <AssignmentForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={fetchData} // Directly fetch data after creation
-        courses={courses} // Pass courses to AssignmentForm
+        onSubmit={handleCreateAssignment}
       />
 
-      {/* Update assignment Modal */}
+      {/* Update Assignment Modal */}
       <AssignmentForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
         onSubmit={(assignmentData) => handleUpdateAssignment(selectedAssignment.id, assignmentData)}
         initialData={selectedAssignment}
-        courses={courses} // Pass courses to AssignmentForm
       />
     </DashboardLayout>
   );
 }
 
-export default Assignments;
+export default Assignment;

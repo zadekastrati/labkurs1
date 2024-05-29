@@ -60,32 +60,18 @@ exports.getAssignmentById = getAssignmentById;
 // Update a course by id with validation
 async function updateAssignment(req, res) {
   const id = req.params.id;
-  const { name, description, courseId } = req.body;
-
-  if (!name || !description || !courseId) {
-    return res.status(400).json({ message: 'All fields (name, description, courseId) must be provided.' });
-  }
-
   try {
-    // Check if the categoryId exists in the categories table
-    const course = await Course.findByPk(courseIdId);
-    if (!course) {
-      return res.status(400).json({ message: 'Invalid courseId' });
-    }
-
-    const [updatedRowsCount, updatedRows] = await Assignment.update(
-      { name, description, courseId },
-      { where: { id }, returning: true, plain: true }
-    );
-
+    const [updatedRowsCount, updatedRows] = await Assignment.update(req.body, {
+      where: { id },
+      returning: true,
+    });
     if (updatedRowsCount === 0) {
-      res.status(404).json({ message: `No course found with id ${id}, or no changes made.` });
+      res.status(404).json({ message: `Assignment with id ${id} not found` });
     } else {
-      const updatedAssignment = await Assignment.findByPk(id, { include: Course });
-      res.status(200).json(updatedAssignment);
+      res.status(200).json(updatedRows[0]);
     }
   } catch (err) {
-    res.status(500).json({ message: `Error updating course: ${err.message}` });
+    res.status(500).json({ message: err.message });
   }
 }
 exports.updateAssignment = updateAssignment;
@@ -96,12 +82,12 @@ async function deleteAssignment(req, res) {
   try {
     const deletedRowCount = await Assignment.destroy({ where: { id } });
     if (deletedRowCount === 0) {
-      res.status(404).json({ message: `Course with id ${id} not found.` });
+      res.status(404).json({ message: `Assignment with id ${id} not found` });
     } else {
       res.status(204).send();
     }
   } catch (err) {
-    res.status(500).json({ message: `Error deleting course: ${err.message}` });
+    res.status(500).json({ message: err.message });
   }
 }
 exports.deleteAssignment = deleteAssignment;
