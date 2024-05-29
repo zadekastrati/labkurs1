@@ -7,15 +7,15 @@ import {
   DialogActions,
   Button,
   TextField,
+  MenuItem,
 } from "@mui/material";
 
-function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
+function AssignmentForm ({ open, handleClose, onSubmit, initialData }) {
+  const [selectedOption] = useState(null);
   const [formData, setFormData] = useState(
-    initialData || { name: "", description: "", courseId: "" }
+    initialData || { name: "", description: "", course: "" }
   );
   const [courses, setCourses] = useState([]);
-  const [selectedOption, setSelectedOption] = useState(null); // Add this line to declare selectedOption
-
   const coursesArray = [];
   courses.forEach((course) => {
     coursesArray.push({ value: course.id, label: course.title });
@@ -23,10 +23,9 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
 
   useEffect(() => {
     if (!initialData && open) {
-      setFormData({ name: "", description: "", courseId: "" });
+      setFormData({ name: "", description: "", course: "" });
     } else if (initialData) {
       setFormData(initialData);
-      setSelectedOption(coursesArray.find(option => option.value === initialData.courseId)); // Set the initial selected option
     }
     fetchCourses();
   }, [open, initialData]);
@@ -39,11 +38,11 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
     }));
   };
 
-  const handleCourseChange = (option) => {
-    setSelectedOption(option); // Set the selected option
+  const handleCourseChange = (e) => {
+    const value = e.value;
     setFormData((prevData) => ({
       ...prevData,
-      courseId: option.value,
+      courseId: value,
     }));
   };
 
@@ -113,7 +112,7 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
 
   return (
     <Dialog
-      id="assignmentsModal"
+      id='assignmentsModal'
       open={open}
       onClose={handleClose}
       fullWidth={true}
@@ -152,7 +151,7 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
             name="courseId"
             label="Course"
             fullWidth
-            value={selectedOption} // Use selectedOption here
+            defaultValue={selectedOption}
             onChange={handleCourseChange}
             options={coursesArray}
             menuPortalTarget={document.getElementById('assignmentsModal')}
@@ -172,4 +171,3 @@ function AssignmentForm({ open, handleClose, onSubmit, initialData }) {
 }
 
 export default AssignmentForm;
- 
