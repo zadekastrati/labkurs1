@@ -9,6 +9,10 @@ import routes from "routes";
 import { useMaterialUIController, setMiniSidenav } from "context";
 import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
+import Basic from "./layouts/authentication/sign-in";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider } from "./context/AuthContext";
+import Dashboard from './layouts/dashboard';
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -79,14 +83,14 @@ export default function App() {
           />
         </>
       )}
+      <AuthProvider>
        <Routes>
         {getRoutes(routes)}
         <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="/authentication/sign-in" element={<Basic />} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       </Routes>
-     
-      
-      
-
+      </AuthProvider>
     </ThemeProvider>
     
   );
