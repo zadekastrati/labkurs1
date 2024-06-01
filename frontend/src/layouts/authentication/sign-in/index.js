@@ -14,7 +14,7 @@ import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
-import { useAuth } from "context/AuthContext";
+import { useAuth } from "../../../context/AuthContext";
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);

@@ -1,19 +1,11 @@
-import React from "react";
-import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import React from 'react';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // Adjust the path according to your project structure
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
 
-  console.log("isAuthenticated:", isAuthenticated); // Debugging
-
-  if (!isAuthenticated) {
-    console.log("User not authenticated. Redirecting to sign-in page."); // Debugging
-    return <Navigate to="/authentication/sign-in" />;
-  }
-
-  console.log("User authenticated. Rendering children."); // Debugging
-  return children;
+  return isAuthenticated ? children : <Navigate to="..\layouts\authentication\sign-in\index.js" />;
 };
 
 export default ProtectedRoute;

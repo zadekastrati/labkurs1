@@ -10,8 +10,8 @@ const studentsRoutes = require("./routes/students.routes");
 const categoriesRoutes = require("./routes/categories.routes");
 const cityRoutes = require("./routes/city.routes");
 const authRoutes = require("./routes/auth.routes");
-const AssignmentRoutes = require("./routes/assignments.routes.js");
-
+const assignmentRoutes = require("./routes/assignments.routes");
+const countRoutes = require("./routes/count.routes"); // Add this line
 
 // Initialize Express app
 const app = express();
@@ -37,7 +37,8 @@ app.use('/api/students', studentsRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/city', cityRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/api/assignment", AssignmentRoutes);
+app.use("/api/assignment", assignmentRoutes);
+app.use("/api/counts", countRoutes); // Add this line
 
 app.get('/', (req, res) => {
   res.send('Welcome to the Coders Academy API!');
