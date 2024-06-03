@@ -1,4 +1,4 @@
-// Material Dashboard 2 React layouts
+// routes.js
 import Dashboard from "layouts/dashboard";
 import Users from "layouts/users";
 import Roles from "layouts/roles";
@@ -8,15 +8,11 @@ import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
 import City from "layouts/city";
-import Basic from "layouts/authentication/sign-in";
-import  Assignments from 'layouts/assignments';
+import Assignments from "layouts/assignments";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
-import { faGears } from '@fortawesome/free-solid-svg-icons';
-import { faCity } from '@fortawesome/free-solid-svg-icons';
-import { faPersonChalkboard } from "@fortawesome/free-solid-svg-icons";
+import { faCircleUser, faGears, faCity, faPersonChalkboard } from '@fortawesome/free-solid-svg-icons';
 
 const routes = [
   {
@@ -26,14 +22,6 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },
-  {
-    type: "collapse",
-    name: "Sign-in",
-    key: "signin",
-    icon: <Icon fontSize="small">dashboard</Icon>,
-    route: "/login",
-    component: <Basic />,
   },    
   {
     type: "collapse",
@@ -94,18 +82,18 @@ const routes = [
   {
     type: "collapse",
     name: "City",
-    key: "City",
+    key: "city",
     icon: <FontAwesomeIcon icon={faCity} />,
     route: "/city",
     component: <City />,
   },
   {
-    type:"collapse",
-    name:"Assignments",
-    key:"assignments",
-    icon:<Icon fontSize="small">assignment</Icon>,
-    route:"/assignments",
-    component:<Assignments/>,
+    type: "collapse",
+    name: "Assignments",
+    key: "assignments",
+    icon: <Icon fontSize="small">assignment</Icon>,
+    route: "/assignments",
+    component: <Assignments />,
   },
 ];
 
