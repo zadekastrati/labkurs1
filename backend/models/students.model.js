@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const db = require('../config/db.config.js');
+const { db } = require('../config/db.config.js'); // Correct import
 const City = require("./city.model.js");
 
 const Student = db.define('Student', {
@@ -26,6 +26,7 @@ const Student = db.define('Student', {
     defaultValue: DataTypes.NOW,
   },
 }, {
+  tableName: 'students', // Explicitly specify the table name if different
 });
 
 Student.belongsTo(City, { foreignKey: 'cityId' });

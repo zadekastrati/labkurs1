@@ -1,4 +1,3 @@
-// db.config.js
 const { Sequelize } = require('sequelize');
 
 const db = new Sequelize('labkurs1', 'root', '', {
@@ -7,11 +6,9 @@ const db = new Sequelize('labkurs1', 'root', '', {
   logging: false, // Disable logging SQL queries
 });
 
-const jwtSecret = process.env.JWT_SECRET || 'default_secret_key';
+const jwtSecret = process.env.JWT_SECRET || 'ecaf226b8e59e7783ad4dc1e9483e1b5';
 
 module.exports = {
-  jwtSecret: 'ecaf226b8e59e7783ad4dc1e9483e1b5',
+  db,
+  jwtSecret
 };
-
-
-module.exports = db;

@@ -35,6 +35,7 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
         },
         body: JSON.stringify(formData),
       });
@@ -57,6 +58,7 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
           },
           body: JSON.stringify(formData),
         }
@@ -107,14 +109,14 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
           onChange={handleChange}
         />
         <TextField
-        autoFocus
-        margin="dense"
-        name="specialization"
-        label="Specialization"
-        fullWidth
-        value={formData.specialization}
-        onChange={handleChange}
-      />
+          autoFocus
+          margin="dense"
+          name="specialization"
+          label="Specialization"
+          fullWidth
+          value={formData.specialization}
+          onChange={handleChange}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">

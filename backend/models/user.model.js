@@ -1,9 +1,9 @@
-const { DataTypes } = require("sequelize");
-const db = require("../config/db.config.js");
-const bcrypt = require("bcrypt");
-const Role = require("./roles.model.js");
+const { DataTypes } = require('sequelize');
+const { db } = require('../config/db.config'); // Correct import
+const bcrypt = require('bcrypt');
+const Role = require('./roles.model');
 
-const User = db.define("User", {
+const User = db.define('User', {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -52,6 +52,6 @@ const User = db.define("User", {
   },
 });
 
-User.belongsTo(Role, { foreignKey: "roleId" });
+User.belongsTo(Role, { foreignKey: 'roleId' });
 
 module.exports = User;

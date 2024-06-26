@@ -29,18 +29,29 @@ function Basic() {
     event.preventDefault();
     try {
       const response = await axios.post("http://localhost:8080/api/auth/login", { email, password });
-      const { token } = response.data;
-
-      // Save token and update authentication state
-      login(token);
-
-      // Redirect to a protected route after successful login
-      navigate("/dashboard");
+      const { token, role } = response.data;
+  
+      // Save token and role based on remember me status
+      if (rememberMe) {
+        localStorage.setItem('jwtToken', token); // Store the token in localStorage if 'Remember Me' is checked
+        localStorage.setItem('role', role); // Store the role in localStorage if 'Remember Me' is checked
+      } else {
+        sessionStorage.setItem('jwtToken', token); // Store the token in sessionStorage if 'Remember Me' is not checked
+        sessionStorage.setItem('role', role); // Store the role in sessionStorage if 'Remember Me' is not checked
+      }
+  
+      // Set the token for future requests (optional here because it will be set on reload/app load)
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  
+      login(token);  // Update authentication state (assuming this function handles your context state)
+  
+      navigate("/dashboard"); // Redirect to a protected route after successful login
     } catch (error) {
       console.error("Login failed:", error);
       alert("Login failed. Please check your credentials and try again.");
     }
   };
+  
 
   return (
     <BasicLayout image={bgImage}>

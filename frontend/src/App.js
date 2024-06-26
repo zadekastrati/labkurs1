@@ -21,7 +21,11 @@ import Courses from './layouts/courses';
 import Students from './layouts/students';
 import Trainers from './layouts/trainers';
 import Assignments from './layouts/assignments';
+import Exam from './layouts/exam';
+import Unauthorized from './layouts/Unauthorized/index.js'; 
 import { AuthProvider } from "./context/AuthContext";
+// import { useAuth } from './context/AuthContext';
+import axios from 'axios';
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -34,8 +38,8 @@ export default function App() {
     whiteSidenav,
     darkMode,
   } = controller;
-  const [onMouseEnter, setOnMouseEnter] = useState(false);
   const { pathname } = useLocation();
+  const [onMouseEnter, setOnMouseEnter] = useState(false); // State for mouse enter
 
   const handleOnMouseEnter = () => {
     if (miniSidenav && !onMouseEnter) {
@@ -49,7 +53,16 @@ export default function App() {
       setMiniSidenav(dispatch, true);
       setOnMouseEnter(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      console.log('Axios default headers set:', axios.defaults.headers.common); // Debug log
+    }
+  }, []);
+  
 
   useEffect(() => {
     document.body.setAttribute("dir", direction);
@@ -78,8 +91,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Basic />} />
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
-          <Route path="/roles" element={<ProtectedRoute><Roles /></ProtectedRoute>} />
+          <Route path="/users" element={<ProtectedRoute requiredRole={4}><Users /></ProtectedRoute>} />
+          <Route path="/roles" element={<ProtectedRoute requiredRole={4}><Roles /></ProtectedRoute>} />
           <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
           <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
           <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
@@ -87,6 +100,8 @@ export default function App() {
           <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
           <Route path="/city" element={<ProtectedRoute><City /></ProtectedRoute>} />
           <Route path="/assignments" element={<ProtectedRoute><Assignments /></ProtectedRoute>} />
+          <Route path="/exam" element={<ProtectedRoute><Exam/></ProtectedRoute>}/>
+          <Route path="/unauthorized" element={<Unauthorized />} /> {/* Add this route */}
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="*" element={<Navigate to="/login" />} /> {/* Redirect to login for any unknown routes */}
         </Routes>

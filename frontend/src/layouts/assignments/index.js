@@ -1,29 +1,32 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, Button, TextField ,IconButton} from "@mui/material";
 import Icon from '@mui/material/Icon';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDBadge from "@mui/material/Badge";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/assignments/DataTable";
 import { Link } from "react-router-dom";
-import AssignmentForm from "layouts/assignments/form";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import UserForm from "layouts/assignments/form";
+import { useAuth } from "../../context/AuthContext";
 
-function Assignment() {
+
+function Assignments() {
+  const { user } = useAuth(); 
   const [assignmentData, setAssignmentData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteAssignmentId, setDeleteAssignmentId] = useState(null);
-  const [openCreateModal, setOpenCreateModal] = useState(false);
-  const [openUpdateModal, setOpenUpdateModal] = useState(false); 
-  const [selectedAssignment, setSelectedAssignment] = useState(null); 
+  const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
+  const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
+  const [selectedAssignment, setSelectedAssignment] = useState(null); // State to store selected user for update
 
   const handleOpenDeleteModal = (assignmentId) => {
     setDeleteAssignmentId(assignmentId);
@@ -38,10 +41,14 @@ function Assignment() {
     try {
       const response = await fetch(`http://localhost:8080/api/assignment/${assignmentId}`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+        }
       });
       if (response.ok) {
+        // Filter out the deleted user from the userData state
         setAssignmentData((prevData) => prevData.filter((item) => item.id !== assignmentId));
-        handleCloseDeleteModal(); 
+        handleCloseDeleteModal(); // Close the delete modal after successful deletion
       } else {
         throw new Error("Failed to delete assignment");
       }
@@ -59,6 +66,7 @@ function Assignment() {
   };
 
   const handleCreateAssignment = async (assignmentData) => {
+    // Handle creating user logic here
     console.log("Create assignment data:", assignmentData);
     handleCloseCreateModal();
     fetchData();
@@ -74,6 +82,7 @@ function Assignment() {
   };
 
   const handleUpdateAssignment = async (assignmentId, assignmentData) => {
+    // Handle updating user logic here
     console.log("Update assignment data:", assignmentData);
     handleCloseUpdateModal();
     fetchData();
@@ -81,11 +90,16 @@ function Assignment() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/assignment");
+      const response = await fetch("http://localhost:8080/api/assignment", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
+      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
         assignment: <Author name={item.name} description={item.description} />,
@@ -96,17 +110,23 @@ function Assignment() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <MDBox display="flex" alignItems="center">
-              <EditIcon
+          {user?.role === 4 && (
+            <>
+              <IconButton
                 onClick={() => handleOpenUpdateModal(item)}
-                style={{ cursor: "pointer", marginRight: "24px", fontSize: "small" }}
-              />
-              <DeleteIcon
+                sx={{ color: "grey", "&:hover": { color: "blue" } }}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
                 onClick={() => handleOpenDeleteModal(item.id)}
-                style={{ cursor: "pointer", fontSize: "small" }}
-              />
-            </MDBox>
-          </MDBox>
+                sx={{ color: "grey", "&:hover": { color: "red" } }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </>
+          )}
+        </MDBox>
         ),
       }));
       setAssignmentData(formattedData);
@@ -119,59 +139,7 @@ function Assignment() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/assignment")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const formattedData = data.map((item) => ({
-          id: item.id,
-          assignment: <Author name={item.name} description={item.description} />,
-          course: (
-            <MDBox ml={2}>
-              <MDBadge badgeContent={item.Course.title} />
-            </MDBox>
-          ),
-          action: (
-            <MDBox display="flex" alignItems="center" gap={0.5}>
-              <Button
-                component={Link}
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenUpdateModal(item)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'blue', 
-                }}}
-              >
-                <Icon fontSize="small">edit</Icon>
-              </Button>
-
-              <Button
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenDeleteModal(item.id)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'red', 
-                }}}
-              >
-                <Icon fontSize="small">delete</Icon>
-              </Button>
-            </MDBox>
-          ),
-        }));
-        setAssignmentData(formattedData);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false);
-      });
+    fetchData();
   }, []);
 
   const Author = ({ name, description }) => (
@@ -194,9 +162,11 @@ function Assignment() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -249,15 +219,15 @@ function Assignment() {
         </DialogActions>
       </Dialog>
 
-      {/* Create Assignment Modal */}
-      <AssignmentForm
+      {/* Create User Modal */}
+      <UserForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
         onSubmit={handleCreateAssignment}
       />
 
-      {/* Update Assignment Modal */}
-      <AssignmentForm
+      {/* Update User Modal */}
+      <UserForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
         onSubmit={(assignmentData) => handleUpdateAssignment(selectedAssignment.id, assignmentData)}
@@ -267,4 +237,4 @@ function Assignment() {
   );
 }
 
-export default Assignment;
+export default Assignments;

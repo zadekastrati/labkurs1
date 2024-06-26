@@ -18,9 +18,9 @@ function Roles() {
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [deleteRoleId, setDeleteRoleId] = useState(null);
-  const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
-  const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
-  const [selectedRole, setSelectedRole] = useState(null); // State to store selected role for update
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [selectedRole, setSelectedRole] = useState(null);
 
   const handleOpenDeleteModal = (roleId) => {
     setDeleteRoleId(roleId);
@@ -33,8 +33,12 @@ function Roles() {
 
   const handleDeleteRole = async (roleId) => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(`http://localhost:8080/api/roles/${roleId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       if (response.ok) {
         handleCloseDeleteModal();
@@ -56,7 +60,6 @@ function Roles() {
   };
 
   const handleCreateRole = async (roleData) => {
-    // Handle creating role logic here
     console.log("Create role data:", roleData);
     handleCloseCreateModal();
     fetchData();
@@ -72,7 +75,6 @@ function Roles() {
   };
 
   const handleUpdateRole = async (roleId, roleData) => {
-    // Handle updating role logic here
     console.log("Update role data:", roleData);
     handleCloseUpdateModal();
     fetchData();
@@ -80,12 +82,16 @@ function Roles() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/roles");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/roles", {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
         title: (
@@ -98,29 +104,22 @@ function Roles() {
         action: (
           <MDBox display="flex" alignItems="center">
             <Button
-                component={Link}
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenUpdateModal(item)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'blue', 
-                }}}
-              >
-                <Icon fontSize="small">edit</Icon>
-              </Button>
-
-              <Button
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenDeleteModal(item.id)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'red', 
-                }}}
-              >
-                <Icon fontSize="small">delete</Icon>
-              </Button>
+              component={Link}
+              variant="caption"
+              fontWeight="medium"
+              onClick={() => handleOpenUpdateModal(item)}
+              sx={{ minWidth: 0, padding: '4px', ':hover': { color: 'blue' }}}
+            >
+              <Icon fontSize="small">edit</Icon>
+            </Button>
+            <Button
+              variant="caption"
+              fontWeight="medium"
+              onClick={() => handleOpenDeleteModal(item.id)}
+              sx={{ minWidth: 0, padding: '4px', ':hover': { color: 'red' }}}
+            >
+              <Icon fontSize="small">delete</Icon>
+            </Button>
           </MDBox>
         ),
       }));

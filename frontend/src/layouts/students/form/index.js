@@ -9,31 +9,16 @@ import {
   TextField,
 } from "@mui/material";
 
-function StudentForm({ open, handleClose, onSubmit, initialData }) {
+function StudentsForm({ open, handleClose, onSubmit, initialData, cities }) {
   const [formData, setFormData] = useState(
     initialData || { firstName: "", lastName: "", cityId: "" }
   );
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [cities, setCities] = useState([]);
 
   useEffect(() => {
-    if (open) {
-      if (!initialData) {
-        setFormData({ firstName: "", lastName: "", cityId: "" });
-        setSelectedOption(null);
-      } else {
-        setFormData(initialData);
-        if (initialData.city) {
-          const initialCity = {
-            value: initialData.city.id,
-            label: initialData.city.name,
-          };
-          setSelectedOption(initialCity);
-        } else {
-          setSelectedOption(null);
-        }
-      }
-      fetchCities();
+    if (!initialData && open) {
+      setFormData({ firstName: "", lastName: "", cityId: "" });
+    } else if (initialData) {
+      setFormData(initialData);
     }
   }, [open, initialData]);
 
@@ -46,72 +31,62 @@ function StudentForm({ open, handleClose, onSubmit, initialData }) {
   };
 
   const handleCityChange = (selectedOption) => {
-    setSelectedOption(selectedOption);
+    const value = selectedOption.value;
     setFormData((prevData) => ({
       ...prevData,
-      cityId: selectedOption.value,
+      cityId: value,
     }));
   };
 
-    const handleCreateStudent = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/students", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-        if (response.ok) {
-          handleClose();
-          onSubmit(formData);
-        } else {
-          throw new Error("Failed to create Student");
-        }
-      } catch (error) {
-        console.error("Error creating Student:", error);
+  const handleCreateStudents = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/students", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        handleClose();
+        onSubmit();
+      } else {
+        throw new Error("Failed to create student");
       }
-    };
-
-    const handleUpdateStudent = async () => {
-      try {
-        const response = await fetch(`http://localhost:8080/api/students/${initialData.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-        if (response.ok) {
-          handleClose();
-          onSubmit(formData);
-        } else {
-          throw new Error("Failed to update Student");
-        }
-      } catch (error) {
-        console.error("Error updating Student:", error);
-      }
-    };
-
-  const handleSubmit = async () => {
-    if (initialData) {
-      await handleUpdateStudent();
-    } else {
-      await handleCreateStudent();
+    } catch (error) {
+      console.error("Error creating student:", error);
     }
   };
 
-  const fetchCities = async () => {
+  const handleUpdateStudents = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/city");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch(`http://localhost:8080/api/students/${initialData.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData),
+      });
       if (response.ok) {
-        const data = await response.json();
-        setCities(data); // Assuming cities are stored in the database with properties: id and name
+        handleClose();
+        onSubmit();
       } else {
-        throw new Error("Failed to fetch cities");
+        throw new Error("Failed to update student");
       }
     } catch (error) {
-      console.error("Error fetching cities:", error);
+      console.error("Error updating student:", error);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (initialData) {
+      await handleUpdateStudents();
+    } else {
+      await handleCreateStudents();
     }
   };
 
@@ -122,11 +97,11 @@ function StudentForm({ open, handleClose, onSubmit, initialData }) {
 
   return (
     <Dialog
-      id="StudentsModal"
+      id='studentsModal'
       open={open}
       onClose={handleClose}
       fullWidth={true}
-      maxWidth="false"
+      maxWidth="sm"
       PaperProps={{
         style: {
           width: "30vw",
@@ -155,18 +130,16 @@ function StudentForm({ open, handleClose, onSubmit, initialData }) {
           value={formData.lastName}
           onChange={handleChange}
         />
-        <div className="App">
-          <Select
-            margin="dense"
-            name="cityId"
-            label="City"
-            fullWidth
-            value={selectedOption}
-            onChange={handleCityChange}
-            options={citiesArray}
-            menuPortalTarget={document.getElementById('StudentsModal')}
-          />
-        </div>
+        <Select
+          margin="dense"
+          name="cityId"
+          label="City"
+          fullWidth
+          value={citiesArray.find(option => option.value === formData.cityId) || null}
+          onChange={handleCityChange}
+          options={citiesArray}
+          menuPortalTarget={document.getElementById('studentsModal')}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
@@ -180,4 +153,4 @@ function StudentForm({ open, handleClose, onSubmit, initialData }) {
   );
 }
 
-export default StudentForm;
+export default StudentsForm;

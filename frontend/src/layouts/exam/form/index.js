@@ -7,20 +7,27 @@ import {
   DialogActions,
   Button,
   TextField,
+  MenuItem,
 } from "@mui/material";
 
-function CourseForm({ open, handleClose, onSubmit, initialData, categories }) {
-  const [selectedOption] = useState(null);
+function ExamForm ({ open, handleClose, onSubmit, initialData }) {
+  const [selectedOption,setSelectedOption] = useState(null);
   const [formData, setFormData] = useState(
-    initialData || { title: "", description: "", categoryId: "" }
+    initialData || { name: "", course: "" }
   );
+  const [courses, setCourses] = useState([]);
+  const coursesArray = [];
+  courses.forEach((course) => {
+    coursesArray.push({ value: course.id, label: course.title });
+  });
 
   useEffect(() => {
     if (!initialData && open) {
-      setFormData({ title: "", description: "", categoryId: "" });
+      setFormData({ name: "", course: "" });
     } else if (initialData) {
       setFormData(initialData);
     }
+    fetchCourses();
   }, [open, initialData]);
 
   const handleChange = (e) => {
@@ -31,74 +38,87 @@ function CourseForm({ open, handleClose, onSubmit, initialData, categories }) {
     }));
   };
 
-  const handleCategoryChange = (e) => {
+  const handleCourseChange = (e) => {
     const value = e.value;
     setFormData((prevData) => ({
       ...prevData,
-      categoryId: value,
+      courseId: value,
     }));
   };
 
-  const handleCreateCourse = async () => {
+  const handleCreateExam = async () => {
     try {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch("http://localhost:8080/api/courses", {
+      const response = await fetch("http://localhost:8080/api/exam", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
         },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
         handleClose();
-        onSubmit();
+        onSubmit(formData);
       } else {
-        throw new Error("Failed to create course");
+        throw new Error("Failed to create exam");
       }
     } catch (error) {
-      console.error("Error creating course:", error);
+      console.error("Error creating exam:", error);
     }
   };
 
-  const handleUpdateCourse = async () => {
+  const handleUpdateExam = async () => {
     try {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch(`http://localhost:8080/api/courses/${initialData.id}`, {
+      const response = await fetch(`http://localhost:8080/api/exam/${initialData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` 
         },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
         handleClose();
-        onSubmit();
+        onSubmit(formData);
       } else {
-        throw new Error("Failed to update course");
+        throw new Error("Failed to update exam");
       }
     } catch (error) {
-      console.error("Error updating course:", error);
+      console.error("Error updating exam:", error);
     }
   };
 
   const handleSubmit = async () => {
     if (initialData) {
-      await handleUpdateCourse();
+      await handleUpdateExam();
     } else {
-      await handleCreateCourse();
+      await handleCreateExam();
+    }
+    fetchCourses();
+    handleClose();
+  };
+
+  const fetchCourses = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/courses",{
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+      }
+    });
+      if (response.ok) {
+        const data = await response.json();
+        setCourses(data);
+      } else {
+        throw new Error("Failed to fetch courses");
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
     }
   };
 
-  const categoriesArray = categories.map((category) => ({
-    value: category.id,
-    label: category.name,
-  }));
-
   return (
     <Dialog
-      id='coursesModal'
+      id='examModal'
       open={open}
       onClose={handleClose}
       fullWidth={true}
@@ -112,35 +132,27 @@ function CourseForm({ open, handleClose, onSubmit, initialData, categories }) {
         },
       }}
     >
-      <DialogTitle>{initialData ? "Edit Course" : "Create Course"}</DialogTitle>
+      <DialogTitle>{initialData ? "Edit Exam" : "Create Exam"}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
-          name="title"
+          name="name"
           label="Name"
           fullWidth
-          value={formData.title}
-          onChange={handleChange}
-        />
-        <TextField
-          margin="dense"
-          name="description"
-          label="Description"
-          fullWidth
-          value={formData.description}
+          value={formData.name}
           onChange={handleChange}
         />
         <div className="App">
           <Select
             margin="dense"
-            name="categoryId"
-            label="Category"
+            name="courseId"
+            label="Course"
             fullWidth
             defaultValue={selectedOption}
-            onChange={handleCategoryChange}
-            options={categoriesArray}
-            menuPortalTarget={document.getElementById('coursesModal')}
+            onChange={handleCourseChange}
+            options={coursesArray}
+            menuPortalTarget={document.getElementById('examModal')}
           />
         </div>
       </DialogContent>
@@ -156,4 +168,4 @@ function CourseForm({ open, handleClose, onSubmit, initialData, categories }) {
   );
 }
 
-export default CourseForm;
+export default ExamForm;
