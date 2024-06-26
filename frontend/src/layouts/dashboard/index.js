@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import IconButton from '@mui/material/IconButton';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../../context/AuthContext';
 
 // @mui material components
 import Grid from "@mui/material/Grid";
@@ -25,6 +28,7 @@ import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
+  const { logout } = useAuth();
   
   // State to store the counts
   const [counts, setCounts] = useState({
@@ -52,6 +56,11 @@ function Dashboard() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <MDBox display="flex" justifyContent="flex-end" p={2}>
+        <IconButton color="inherit" onClick={logout}>
+          <LogoutIcon />
+        </IconButton>
+      </MDBox>
       <MDBox py={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
-import Icon from '@mui/material/Icon';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
-import MDBadge from "@mui/material/Badge";
+import MDBadge from "components/MDBadge";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
@@ -12,19 +11,22 @@ import Footer from "examples/Footer";
 import DataTable from "layouts/users/DataTable";
 import { Link } from "react-router-dom";
 import UserForm from "layouts/users/form";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 function Users() {
-  const [userData, setUserData] = useState([]);
+  const [usersData, setUsersData] = useState([]);
+  const [roles, setRoles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteUserId, setDeleteUserId] = useState(null);
-  const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
-  const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
-  const [selectedUser, setSelectedUser] = useState(null); // State to store selected user for update
+  const [deleteUsersId, setDeleteUsersId] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState(null);
 
-  const handleOpenDeleteModal = (userId) => {
-    setDeleteUserId(userId);
+  const handleOpenDeleteModal = (usersId) => {
+    setDeleteUsersId(usersId);
     setOpenDeleteModal(true);
   };
 
@@ -32,24 +34,28 @@ function Users() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUsers = async (usersId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch(`http://localhost:8080/api/users/${usersId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (response.ok) {
-        // Filter out the deleted user from the userData state
-        setUserData((prevData) => prevData.filter((item) => item.id !== userId));
-        handleCloseDeleteModal(); // Close the delete modal after successful deletion
+        setUsersData((prevData) => prevData.filter((item) => item.id !== usersId));
+        handleCloseDeleteModal();
       } else {
-        throw new Error("Failed to delete user");
+        throw new Error("Failed to delete users");
       }
     } catch (error) {
-      console.error("Error deleting user:", error);
+      console.error("Error deleting users:", error);
     }
   };
 
   const handleOpenCreateModal = () => {
+    setSelectedUsers(null);
     setOpenCreateModal(true);
   };
 
@@ -57,15 +63,8 @@ function Users() {
     setOpenCreateModal(false);
   };
 
-  const handleCreateUser = async (userData) => {
-    // Handle creating user logic here
-    console.log("Create user data:", userData);
-    handleCloseCreateModal();
-    fetchData();
-  };
-
-  const handleOpenUpdateModal = (user) => {
-    setSelectedUser(user);
+  const handleOpenUpdateModal = (users) => {
+    setSelectedUsers(users);
     setOpenUpdateModal(true);
   };
 
@@ -73,24 +72,43 @@ function Users() {
     setOpenUpdateModal(false);
   };
 
-  const handleUpdateUser = async (userId, userData) => {
-    // Handle updating user logic here
-    console.log("Update user data:", userData);
-    handleCloseUpdateModal();
-    fetchData();
+  const handleUpdateUsers = async (usersId, usersData) => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch(`http://localhost:8080/api/users/${usersId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(usersData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update Users");
+      }
+      fetchData(); // Refetch data after updating a Users
+      handleCloseUpdateModal();
+    } catch (error) {
+      console.error("Error updating Users:", error);
+    }
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/users");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/users", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
-      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
-        user: <Author name={item.name} email={item.email} />,
+        users: <Author name={item.name} email={item.email} />,
         role: (
           <MDBox ml={2}>
             <MDBadge badgeContent={item.Role.title} />
@@ -98,28 +116,18 @@ function Users() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <Button
-              component={Link}
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
+            <EditIcon
               onClick={() => handleOpenUpdateModal(item)}
-            >
-              Edit
-            </Button>
-
-            <Button
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
+              style={{ cursor: "pointer", marginRight: "24px", fontSize: "2.5rem" }}
+            />
+            <DeleteIcon
               onClick={() => handleOpenDeleteModal(item.id)}
-            >
-              Delete
-            </Button>
+              style={{ cursor: "pointer", fontSize: "2.5rem" }}
+            />
           </MDBox>
         ),
       }));
-      setUserData(formattedData);
+      setUsersData(formattedData);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -128,60 +136,28 @@ function Users() {
     }
   };
 
-  useEffect(() => {
-    fetch("http://localhost:8080/api/users")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/roles", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-        return response.json();
-      })
-      .then((data) => {
-        const formattedData = data.map((item) => ({
-          id: item.id,
-          user: <Author name={item.name} email={item.email} />,
-          role: (
-            <MDBox ml={2}>
-              <MDBadge badgeContent={item.Role.title} />
-            </MDBox>
-          ),
-          action: (
-            <MDBox display="flex" alignItems="center" gap={0.5}>
-              <Button
-                component={Link}
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenUpdateModal(item)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'blue', 
-                }}}
-              >
-                <Icon fontSize="small">edit</Icon>
-              </Button>
-
-              <Button
-                variant="caption"
-                fontWeight="medium"
-                onClick={() => handleOpenDeleteModal(item.id)}
-                sx={{ minWidth: 0, padding: '4px',
-                ':hover': {
-                  color: 'red', 
-                }}}
-              >
-                <Icon fontSize="small">delete</Icon>
-              </Button>
-            </MDBox>
-          ),
-        }));
-        setUserData(formattedData);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false);
       });
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setRoles(data);
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchRoles();
   }, []);
 
   const Author = ({ name, email }) => (
@@ -196,8 +172,8 @@ function Users() {
   );
 
   const columns = [
-    { Header: "User", accessor: "user", width: "45%", align: "left" },
-    { Header: "Role", accessor: "role", align: "left" },
+    { Header: "users", accessor: "users", width: "45%", align: "left" },
+    { Header: "role", accessor: "role", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
@@ -232,7 +208,7 @@ function Users() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: userData }}
+                    table={{ columns, rows: usersData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -249,32 +225,34 @@ function Users() {
       {/* Delete Confirmation Modal */}
       <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <DialogContent>
-          <MDTypography>Are you sure you want to delete this user?</MDTypography>
+          <MDTypography>Are you sure you want to delete this User?</MDTypography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
-          <Button onClick={() => handleDeleteUser(deleteUserId)} color="error">
+          <Button onClick={() => handleDeleteUsers(deleteUsersId)} color="error">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Create User Modal */}
+      {/* Create course Modal */}
       <UserForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={handleCreateUser}
+        onSubmit={fetchData} // Directly fetch data after creation
+        roles={roles} // Pass roles to CourseForm
       />
 
-      {/* Update User Modal */}
+      {/* Update course Modal */}
       <UserForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(userData) => handleUpdateUser(selectedUser.id, userData)}
-        initialData={selectedUser}
+        onSubmit={(usersData) => handleUpdateUsers(selectedUsers.id, usersData)}
+        initialData={selectedUsers}
+        roles={roles} // Pass categories to CourseForm
       />
     </DashboardLayout>
-  );
+  );  
 }
 
 export default Users;

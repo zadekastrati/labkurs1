@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const db = require('../config/db.config.js');
+const { db } = require('../config/db.config.js'); // Correct import
 
 const Category = db.define('Category', {
     id: {
@@ -26,6 +26,8 @@ const Category = db.define('Category', {
         allowNull: false,
         defaultValue: DataTypes.NOW
     },
+}, {
+    tableName: 'categories', // Explicitly specify the table name if different
 });
 
 module.exports = Category;

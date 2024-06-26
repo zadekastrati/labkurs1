@@ -8,15 +8,13 @@ import {
   TextField,
 } from "@mui/material";
 
-function RoleForm({ open, handleClose, onSubmit, initialData }) {
-  const [formData, setFormData] = useState(initialData || { title: "" });
+function CategoriesForm({ open, handleClose, onSubmit, initialData }) {
+  const [formData, setFormData] = useState(initialData || { name: "" });
 
   useEffect(() => {
     if (!initialData && open) {
-      // Reset formData to an empty object when opening form to create a new role
-      setFormData({ title: "" });
+      setFormData({ name: "" });
     } else if (initialData) {
-      // Set formData to initialData when opening form to edit an existing role
       setFormData(initialData);
     }
   }, [open, initialData]);
@@ -32,7 +30,7 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
   const handleCreate = async () => {
     try {
       const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch("http://localhost:8080/api/roles", {
+      const response = await fetch("http://localhost:8080/api/categories", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -45,10 +43,10 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
         handleClose();
         onSubmit(data);
       } else {
-        throw new Error("Failed to create role");
+        throw new Error("Failed to create Categories");
       }
     } catch (error) {
-      console.error("Error creating role:", error);
+      console.error("Error creating Categories:", error);
     }
   };
 
@@ -56,12 +54,12 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
     try {
       const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(
-        `http://localhost:8080/api/roles/${initialData.id}`,
+        `http://localhost:8080/api/categories/${initialData.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
         }
@@ -71,11 +69,12 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
         handleClose();
         onSubmit(data);
         const data = await response.json();
+        // onSubmit(formData);
       } else {
-        throw new Error("Failed to update role");
+        throw new Error("Failed to update Categories");
       }
     } catch (error) {
-      console.error("Error updating role:", error);
+      console.error("Error updating Categories:", error);
     }
   };
 
@@ -102,15 +101,15 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
         },
       }}
     >
-      <DialogTitle>{initialData ? "Edit Role" : "Create Role"}</DialogTitle>
+      <DialogTitle>{initialData ? "Edit Categories" : "Create Categories"}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
-          name="title"
-          label="Title"
+          name="name"
+          label="Name"
           fullWidth
-          value={formData.title}
+          value={formData.name}
           onChange={handleChange}
         />
       </DialogContent>
@@ -130,4 +129,4 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
   );
 }
 
-export default RoleForm;
+export default CategoriesForm;

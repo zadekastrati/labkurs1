@@ -31,10 +31,12 @@ function CityForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleCreate = async () => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch("http://localhost:8080/api/city", { // Change port to 8080
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -52,12 +54,14 @@ function CityForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleUpdate = async () => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(
         `http://localhost:8080/api/city/${initialData.id}`, // Change port to 8080
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
         }

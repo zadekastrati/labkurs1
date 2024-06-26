@@ -1,8 +1,7 @@
-// controllers/auth.controller.js
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const User = require("../models/user.model"); // Import User model
-const { db, jwtSecret } = require("../config/db.config"); // Import jwtSecret
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
+const User = require('../models/user.model');
+const { jwtSecret } = require('../config/db.config');
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -11,15 +10,15 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(400).send({ message: "User not found" });
+      return res.status(400).send({ message: 'User not found' });
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      return res.status(401).send({ message: "Invalid password" });
+      return res.status(401).send({ message: 'Invalid password' });
     }
 
-    const token = jwt.sign({ id: user.id }, 'ecaf226b8e59e7783ad4dc1e9483e1b5', { expiresIn: "24h" }); // Use jwtSecret here
+    const token = jwt.sign({ id: user.id, role: user.roleId }, jwtSecret, { expiresIn: '24h' });
 
     res.status(200).send({
       id: user.id,
@@ -27,7 +26,7 @@ exports.login = async (req, res) => {
       token: token,
     });
   } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).send({ message: "Internal server error" });
+    console.error('Error during login:', error);
+    res.status(500).send({ message: 'Internal server error' });
   }
 };

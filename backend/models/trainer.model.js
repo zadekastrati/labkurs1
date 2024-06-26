@@ -1,5 +1,5 @@
 const { DataTypes } = require("sequelize");
-const db = require("../config/db.config.js");
+const { db } = require("../config/db.config.js"); // Correct import
 
 const Trainer = db.define("Trainer", {
   id: {

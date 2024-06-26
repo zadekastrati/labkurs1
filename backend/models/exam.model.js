@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const { db } = require('../config/db.config.js'); // Correct import
-const Course = require("./course.model.js"); // Ensure the correct path
+const Course = require("./course.model.js");
 
-const Assignment = db.define('Assignment', {
+const Exam = db.define('Exam', {
   id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -13,15 +13,11 @@ const Assignment = db.define('Assignment', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
   courseId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'courses', // Ensure this matches the table name in your database
+      model: 'Courses',
       key: 'id'
     },
     onUpdate: 'CASCADE',
@@ -38,9 +34,9 @@ const Assignment = db.define('Assignment', {
     defaultValue: DataTypes.NOW
   },
 }, {
-  tableName: 'assignments', // Explicitly specify the table name
+  tableName: 'exam', // Explicitly specify the table name
 });
 
-Assignment.belongsTo(Course, { foreignKey: 'courseId' });
+Exam.belongsTo(Course, { foreignKey: 'courseId' });
 
-module.exports = Assignment;
+module.exports = Exam;

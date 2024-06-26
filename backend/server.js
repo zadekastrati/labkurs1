@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const db = require("./config/db.config");
+const {db} = require("./config/db.config");
 const userRoutes = require("./routes/user.routes");
 const rolesRoutes = require("./routes/roles.routes");
 const courseRoutes = require("./routes/course.routes");
@@ -11,7 +11,11 @@ const categoriesRoutes = require("./routes/categories.routes");
 const cityRoutes = require("./routes/city.routes");
 const authRoutes = require("./routes/auth.routes");
 const assignmentRoutes = require("./routes/assignments.routes");
-const countRoutes = require("./routes/count.routes"); // Add this line
+const countRoutes = require("./routes/count.routes");
+const examRoutes = require("./routes/exam.routes");
+
+const authenticateUser = require('./middleware/authenticateUser');
+const roleMiddleware = require('./middleware/roleMiddleware');
 
 // Initialize Express app
 const app = express();
@@ -27,21 +31,34 @@ db.sync()
   .then(() => console.log("Database connected and synced"))
   .catch((err) => console.error("Error connecting to database:", err));
 
-// Define routes
-app.use("/api/users", userRoutes);
-app.use("/api/roles", rolesRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/trainers", trainerRoutes);
-app.use("/api/certificates", certificateRoutes);
-app.use("/api/students", studentsRoutes);
-app.use("/api/categories", categoriesRoutes);
-app.use("/api/city", cityRoutes);
+// Public routes
 app.use("/api/auth", authRoutes);
-app.use("/api/assignment", assignmentRoutes);
-app.use("/api/counts", countRoutes); // Add this line
 
-app.get("/", (req, res) => {
-  res.send("Welcome to the Coders Academy API!");
+// Apply authentication middleware for protected routes
+app.use(authenticateUser);
+
+// Protected routes
+app.use('/api/users', roleMiddleware([4]), userRoutes);
+app.use('/api/roles', roleMiddleware([4]), rolesRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/trainers', trainerRoutes);
+app.use('/api/certificates', certificateRoutes);
+app.use('/api/students', studentsRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/city', cityRoutes);
+app.use("/api/assignment", assignmentRoutes);
+app.use("/api/counts", countRoutes);
+app.use('/api/exam', examRoutes);
+
+// Home route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Coders Academy API!');
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
 // Start the server

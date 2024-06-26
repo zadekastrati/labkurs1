@@ -1,35 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogActions, Button, TextField,IconButton } from "@mui/material";
+import Icon from '@mui/material/Icon';
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
-import MDBadge from "components/MDBadge";
+import MDBadge from "@mui/material/Badge";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/courses/DataTable";
+import DataTable from "layouts/exam/DataTable";
 import { Link } from "react-router-dom";
-import CourseForm from "layouts/courses/form";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import UserForm from "layouts/exam/form";
 import { useAuth } from "../../context/AuthContext";
 
-
-function Courses() {
+function Exam() {
   const { user } = useAuth();
-  const [courseData, setCourseData] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [examData, setExamData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteCourseId, setDeleteCourseId] = useState(null);
-  const [openCreateModal, setOpenCreateModal] = useState(false);
-  const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const [deleteExamId, setDeleteExamId] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
+  const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
+  const [selectedExam, setSelectedExam] = useState(null); // State to store selected user for update
 
-  const handleOpenDeleteModal = (courseId) => {
-    setDeleteCourseId(courseId);
+  const handleOpenDeleteModal = (examId) => {
+    setDeleteExamId(examId);
     setOpenDeleteModal(true);
   };
 
@@ -37,37 +36,43 @@ function Courses() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeleteCourse = async (courseId) => {
+  const handleDeleteExam = async (examId) => {
     try {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
+      const response = await fetch(`http://localhost:8080/api/exam/${examId}`, {
         method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
         }
       });
       if (response.ok) {
-        setCourseData((prevData) => prevData.filter((item) => item.id !== courseId));
-        handleCloseDeleteModal();
+        setExamData((prevData) => prevData.filter((item) => item.id !== examId));
+        handleCloseDeleteModal(); // Close the delete modal after successful deletion
       } else {
-        throw new Error("Failed to delete course");
+        throw new Error("Failed to delete exam");
       }
     } catch (error) {
-      console.error("Error deleting course:", error);
+      console.error("Error deleting exam:", error);
     }
   };
 
   const handleOpenCreateModal = () => {
-    setSelectedCourse(null);
     setOpenCreateModal(true);
+    
   };
 
   const handleCloseCreateModal = () => {
     setOpenCreateModal(false);
   };
 
-  const handleOpenUpdateModal = (course) => {
-    setSelectedCourse(course);
+  const handleCreateExam = async (examData) => {
+    // Handle creating user logic here
+    console.log("Create exam data:", examData);
+    handleCloseCreateModal();
+    fetchData();
+  };
+
+  const handleOpenUpdateModal = (exam) => {
+    setSelectedExam(exam);
     setOpenUpdateModal(true);
   };
 
@@ -75,46 +80,31 @@ function Courses() {
     setOpenUpdateModal(false);
   };
 
-  const handleUpdateCourse = async (courseId, courseData) => {
-    try {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(courseData),
-      });
-      if (!response.ok) {
-        throw new Error("Failed to update course");
-      }
-      fetchData(); // Refetch data after updating a course
-      handleCloseUpdateModal();
-    } catch (error) {
-      console.error("Error updating course:", error);
-    }
+  const handleUpdateExam = async (examId,examData) => {
+    // Handle updating user logic here
+    console.log("Update exam data:", examData);
+    handleCloseUpdateModal();
+    fetchData();
   };
 
   const fetchData = async () => {
     try {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch("http://localhost:8080/api/courses", {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await fetch("http://localhost:8080/api/exam",{
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+      }
+    });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
+      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
-        course: <Author name={item.title} description={item.description} />,
-        category: (
+        exam: <Author name={item.name} />,
+        course: (
           <MDBox ml={2}>
-            <MDBadge badgeContent={item.Category.name} />
+            <MDBadge badgeContent={item.Course.title} />
           </MDBox>
         ),
         action: (
@@ -138,7 +128,7 @@ function Courses() {
           </MDBox>
         ),
       }));
-      setCourseData(formattedData);
+      setExamData(formattedData);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -147,44 +137,24 @@ function Courses() {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
-      const response = await fetch("http://localhost:8080/api/categories", {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
   useEffect(() => {
     fetchData();
-    fetchCategories();
   }, []);
 
-  const Author = ({ name, description }) => (
+  const Author = ({ name }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDBox lineHeight={1}>
         <MDTypography display="block" variant="button" fontWeight="medium">
           {name}
         </MDTypography>
-        <MDTypography variant="caption">{description}</MDTypography>
+        {/* <MDTypography variant="caption">{description}</MDTypography> */}
       </MDBox>
     </MDBox>
   );
 
   const columns = [
-    { Header: "course", accessor: "course", width: "45%", align: "left" },
-    { Header: "category", accessor: "category", align: "left" },
+    { Header: "Exam", accessor: "exam", width: "45%", align: "left" },
+    { Header: "Course", accessor: "course", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
@@ -211,7 +181,7 @@ function Courses() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Courses
+                  Exams
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -221,7 +191,7 @@ function Courses() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: courseData }}
+                    table={{ columns, rows: examData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -238,34 +208,32 @@ function Courses() {
       {/* Delete Confirmation Modal */}
       <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <DialogContent>
-          <MDTypography>Are you sure you want to delete this course?</MDTypography>
+          <MDTypography>Are you sure you want to delete this exam?</MDTypography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
-          <Button onClick={() => handleDeleteCourse(deleteCourseId)} color="error">
+          <Button onClick={() => handleDeleteExam(deleteExamId)} color="error">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Create course Modal */}
-      <CourseForm
+      {/* Create User Modal */}
+      <UserForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={fetchData} // Directly fetch data after creation
-        categories={categories} // Pass categories to CourseForm
+        onSubmit={handleCreateExam}
       />
 
-      {/* Update course Modal */}
-      <CourseForm
+      {/* Update User Modal */}
+      <UserForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(courseData) => handleUpdateCourse(selectedCourse.id, courseData)}
-        initialData={selectedCourse}
-        categories={categories} // Pass categories to CourseForm
+        onSubmit={(examData) => handleUpdateExam(selectedExam.id, examData)}
+        initialData={selectedExam}
       />
     </DashboardLayout>
   );
 }
 
-export default Courses;
+export default Exam;

@@ -11,9 +11,9 @@ import {
 } from "@mui/material";
 
 function AssignmentForm ({ open, handleClose, onSubmit, initialData }) {
-  const [selectedOption] = useState(null);
+  const [selectedOption, setSelectedOption] = useState(null);
   const [formData, setFormData] = useState(
-    initialData || { name: "", description: "", course: "" }
+    initialData || { name: "", description: "", courseId: "" }
   );
   const [courses, setCourses] = useState([]);
   const coursesArray = [];
@@ -23,9 +23,11 @@ function AssignmentForm ({ open, handleClose, onSubmit, initialData }) {
 
   useEffect(() => {
     if (!initialData && open) {
-      setFormData({ name: "", description: "", course: "" });
+      setFormData({ name: "", description: "", courseId: "" });
     } else if (initialData) {
-      setFormData(initialData);
+      const { name, description, Course } = initialData;
+      setFormData({ name, description, courseId: Course.id });
+      setSelectedOption({ value: Course.id, label: Course.title });
     }
     fetchCourses();
   }, [open, initialData]);
@@ -52,6 +54,7 @@ function AssignmentForm ({ open, handleClose, onSubmit, initialData }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
         },
         body: JSON.stringify(formData),
       });
@@ -72,6 +75,7 @@ function AssignmentForm ({ open, handleClose, onSubmit, initialData }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
         },
         body: JSON.stringify(formData),
       });
@@ -98,7 +102,11 @@ function AssignmentForm ({ open, handleClose, onSubmit, initialData }) {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/courses");
+      const response = await fetch("http://localhost:8080/api/courses", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setCourses(data);
