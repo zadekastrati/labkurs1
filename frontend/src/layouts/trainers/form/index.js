@@ -14,7 +14,7 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
   useEffect(() => {
     if (!initialData && open) {
       // Reset formData to an empty object when opening form to create a new trainer
-      setFormData({ trainersName: "",  specialization: "" });
+      setFormData({ trainersName: "", specialization: "" });
     } else if (initialData) {
       // Set formData to initialData when opening form to edit an existing trainer
       setFormData(initialData);
@@ -31,17 +31,20 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleCreate = async () => {
     try {
+      const token = localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
       const response = await fetch("http://localhost:8080/api/trainers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        // const data = await response.json();
+        window.location.reload();
         handleClose();
-        onSubmit(formData);
+        // onSubmit(data);
       } else {
         throw new Error("Failed to create trainer");
       }
@@ -52,20 +55,20 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleUpdate = async () => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/trainers/${initialData.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const token = localStorage.getItem("jwtToken") || sessionStorage.getItem("jwtToken");
+      const response = await fetch(`http://localhost:8080/api/trainers/${initialData.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
       if (response.ok) {
+        window.location.reload();
         handleClose();
-        onSubmit(formData);
+        // onSubmit(data);
+        // const data = await response.json();
       } else {
         throw new Error("Failed to update trainer");
       }
@@ -122,11 +125,7 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
         <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
-        <Button
-          onClick={handleSubmit}
-          color="primary"
-          style={{ color: "#3583eb" }}
-        >
+        <Button onClick={handleSubmit} color="primary" style={{ color: "#3583eb" }}>
           {initialData ? "Update" : "Create"}
         </Button>
       </DialogActions>
