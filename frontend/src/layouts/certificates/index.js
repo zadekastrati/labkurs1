@@ -19,8 +19,10 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/certificates/DataTable";
 import CertificateForm from "layouts/certificates/form";
+import { useAuth } from "../../context/AuthContext";
 
 function Certificates() {
+  const { user } = useAuth();
   const [certificateData, setCertificateData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,7 +34,11 @@ function Certificates() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/certificates");
+      const response = await fetch("http://localhost:8080/api/certificates", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        }
+      });
       if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       const formattedData = data.map((item) => ({
@@ -50,12 +56,22 @@ function Certificates() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <IconButton onClick={() => handleOpenUpdateModal(item)}>
-              <EditIcon sx={{ color: "grey", "&:hover": { color: "blue" }, ml: 1 }} />
-            </IconButton>
-            <IconButton onClick={() => handleOpenDeleteModal(item.id)}>
-              <DeleteIcon sx={{ color: "grey", "&:hover": { color: "red" }, ml: 1 }} />
-            </IconButton>
+            {user?.role === 4 && (
+              <>
+                <IconButton
+                  onClick={() => handleOpenUpdateModal(item)}
+                  sx={{ color: "grey", "&:hover": { color: "blue" } }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleOpenDeleteModal(item.id)}
+                  sx={{ color: "grey", "&:hover": { color: "red" } }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            )}
           </MDBox>
         ),
       }));
@@ -82,6 +98,9 @@ function Certificates() {
     try {
       const response = await fetch(`http://localhost:8080/api/certificates/${certificateId}`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        }
       });
       if (!response.ok) throw new Error("Failed to delete certificate");
       setCertificateData((prevData) => prevData.filter((item) => item.id !== certificateId));
@@ -133,9 +152,11 @@ function Certificates() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>

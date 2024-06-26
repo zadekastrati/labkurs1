@@ -17,8 +17,10 @@ import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/trainers/DataTable";
 import TrainerForm from "layouts/trainers/form";
+import { useAuth } from "../../context/AuthContext"; // Correct import
 
 function Trainers() {
+  const { user } = useAuth(); // Use the useAuth hook
   const [trainerData, setTrainerData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -30,7 +32,11 @@ function Trainers() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/trainers");
+      const response = await fetch("http://localhost:8080/api/trainers", {
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        }
+      });
       if (!response.ok) throw new Error("Failed to fetch data");
 
       const data = await response.json();
@@ -52,19 +58,22 @@ function Trainers() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <IconButton
-              component={Link}
-              onClick={() => handleOpenUpdateModal(item)}
-              sx={{ color: "grey", "&:hover": { color: "blue" } }}
-            >
-              <EditIcon />
-            </IconButton>
-            <IconButton
-              onClick={() => handleOpenDeleteModal(item.id)}
-              sx={{ color: "grey", "&:hover": { color: "red" } }}
-            >
-              <DeleteIcon />
-            </IconButton>
+            {user?.role === 4 && (
+              <>
+                <IconButton
+                  onClick={() => handleOpenUpdateModal(item)}
+                  sx={{ color: "grey", "&:hover": { color: "blue" } }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleOpenDeleteModal(item.id)}
+                  sx={{ color: "grey", "&:hover": { color: "red" } }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            )}
           </MDBox>
         ),
       }));
@@ -88,10 +97,13 @@ function Trainers() {
 
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
-  const handleDeleteTrainer = async (trainerId) => {
+  const handleDeleteTrainer = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/api/trainers/${trainerId}`, {
+      const response = await fetch(`http://localhost:8080/api/trainers/${deleteTrainerId}`, {
         method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        }
       });
       if (!response.ok) throw new Error("Failed to delete trainer");
 
@@ -106,9 +118,22 @@ function Trainers() {
   const handleCloseCreateModal = () => setOpenCreateModal(false);
 
   const handleCreateTrainer = async (trainerData) => {
-    console.log("Create trainer data:", trainerData);
-    handleCloseCreateModal();
-    fetchData();
+    try {
+      const response = await fetch("http://localhost:8080/api/trainers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        },
+        body: JSON.stringify(trainerData),
+      });
+      if (!response.ok) throw new Error("Failed to create trainer");
+
+      fetchData();
+      handleCloseCreateModal();
+    } catch (error) {
+      console.error("Error creating trainer:", error);
+    }
   };
 
   const handleOpenUpdateModal = (trainer) => {
@@ -118,10 +143,23 @@ function Trainers() {
 
   const handleCloseUpdateModal = () => setOpenUpdateModal(false);
 
-  const handleUpdateTrainer = async (trainerId, trainerData) => {
-    console.log("Update trainer data:", trainerData);
-    handleCloseUpdateModal();
-    fetchData();
+  const handleUpdateTrainer = async (trainerData) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/trainers/${selectedTrainer.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        },
+        body: JSON.stringify(trainerData),
+      });
+      if (!response.ok) throw new Error("Failed to update trainer");
+
+      fetchData();
+      handleCloseUpdateModal();
+    } catch (error) {
+      console.error("Error updating trainer:", error);
+    }
   };
 
   const columns = [
@@ -133,9 +171,11 @@ function Trainers() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -183,7 +223,7 @@ function Trainers() {
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
           <Button
-            onClick={() => handleDeleteTrainer(deleteTrainerId)}
+            onClick={handleDeleteTrainer}
             color="primary"
             style={{ color: "#ff0000" }}
           >
@@ -203,11 +243,12 @@ function Trainers() {
       <TrainerForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(trainerData) => handleUpdateTrainer(selectedTrainer.id, trainerData)}
+        onSubmit={handleUpdateTrainer}
         initialData={selectedTrainer}
       />
     </DashboardLayout>
   );
+ 
 }
 
 export default Trainers;

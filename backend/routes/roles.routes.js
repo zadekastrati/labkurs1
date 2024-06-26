@@ -1,21 +1,19 @@
 const express = require("express");
 const RolesController = require("../controllers/roles.controller.js");
+const roleMiddleware = require('../middleware/roleMiddleware.js');
 
 const router = express.Router();
 
-// Create a new role
-router.post("/", RolesController.createRole);
+router.post('/add', roleMiddleware([4]), RolesController.createRole);
+router.put('/:id', roleMiddleware([4]), RolesController.updateRole);
+router.delete('/:id', roleMiddleware([4]), RolesController.deleteRole);
 
-// Retrieve all roles
-router.get("/", RolesController.getAllRoles);
+router.get('/', roleMiddleware([4]), RolesController.getAllRoles);
+router.get('/:id', roleMiddleware([4]), RolesController.getRoleById);
 
-// Retrieve a single role by id
-router.get("/:id", RolesController.getRoleById);
+router.post('/', RolesController.createRole);
 
-// Update a role by id
-router.put("/:id", RolesController.updateRole);
-
-// Delete a role by id
-router.delete("/:id", RolesController.deleteRole);
+// Update a user by id
+router.put('/:id', RolesController.updateRole);
 
 module.exports = router;

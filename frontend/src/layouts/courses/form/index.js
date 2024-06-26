@@ -7,26 +7,20 @@ import {
   DialogActions,
   Button,
   TextField,
-  } from "@mui/material";
+} from "@mui/material";
 
-function CourseForm({ open, handleClose, onSubmit, initialData }) {
+function CourseForm({ open, handleClose, onSubmit, initialData, categories }) {
   const [selectedOption] = useState(null);
   const [formData, setFormData] = useState(
-    initialData || { title: "", description: "", category: "" }
+    initialData || { title: "", description: "", categoryId: "" }
   );
-  const [categories, setCategories] = useState([]);
-  const categoriesArray = [];
-  categories.forEach((category) => {
-    categoriesArray.push({ value: category.id, label: category.name });
-  });
 
   useEffect(() => {
     if (!initialData && open) {
-      setFormData({ title: "", description: "", category: "" });
+      setFormData({ title: "", description: "", categoryId: "" });
     } else if (initialData) {
       setFormData(initialData);
     }
-    fetchCategories();
   }, [open, initialData]);
 
   const handleChange = (e) => {
@@ -47,16 +41,18 @@ function CourseForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleCreateCourse = async () => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch("http://localhost:8080/api/courses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
         handleClose();
-        onSubmit(formData);
+        onSubmit();
       } else {
         throw new Error("Failed to create course");
       }
@@ -67,16 +63,18 @@ function CourseForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleUpdateCourse = async () => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(`http://localhost:8080/api/courses/${initialData.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
         handleClose();
-        onSubmit(formData);
+        onSubmit();
       } else {
         throw new Error("Failed to update course");
       }
@@ -91,23 +89,12 @@ function CourseForm({ open, handleClose, onSubmit, initialData }) {
     } else {
       await handleCreateCourse();
     }
-    fetchCategories();
-    handleClose();
   };
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/categories");
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data);
-      } else {
-        throw new Error("Failed to fetch categories");
-      }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  const categoriesArray = categories.map((category) => ({
+    value: category.id,
+    label: category.name,
+  }));
 
   return (
     <Dialog

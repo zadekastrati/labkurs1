@@ -1,42 +1,40 @@
 const express = require("express");
-const db = require("./config/db.config.js");
 const cors = require("cors");
-const userRoutes = require("./routes/user.routes.js");
-const rolesRoutes = require("./routes/roles.routes.js");
-const courseRoutes = require("./routes/course.routes.js");
-const trainerRoutes = require("./routes/trainer.routes.js");
-const certificateRoutes = require("./routes/certificate.routes.js");
-const studentsRoutes = require("./routes/students.routes.js");
-const categoriesRoutes = require("./routes/categories.routes.js");
-const cityRoutes = require("./routes/city.routes.js");
+const {db} = require("./config/db.config");
+const userRoutes = require("./routes/user.routes");
+const rolesRoutes = require("./routes/roles.routes");
+const courseRoutes = require("./routes/course.routes");
+const trainerRoutes = require("./routes/trainer.routes");
+const certificateRoutes = require("./routes/certificate.routes");
+const studentsRoutes = require("./routes/students.routes");
+const categoriesRoutes = require("./routes/categories.routes");
+const cityRoutes = require("./routes/city.routes");
+const authRoutes = require("./routes/auth.routes");
+const assignmentRoutes = require("./routes/assignments.routes");
+const countRoutes = require("./routes/count.routes");
+const examRoutes = require("./routes/exam.routes");
+
+const authenticateUser = require('./middleware/authenticateUser');
+const roleMiddleware = require('./middleware/roleMiddleware');
 
 // Initialize Express app
 const app = express();
 const port = 8080;
 
-// Parse requests of content-type - application/json
+// Middleware
+app.use(cors());
 app.use(express.json());
-
-// Parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors());
-
-// Connect to database
-db.authenticate()
-  .then(() => console.log("Database connected"))
+// Sync database
+db.sync()
+  .then(() => console.log("Database connected and synced"))
   .catch((err) => console.error("Error connecting to database:", err));
 
-// Define routes
-app.use("/api/users", userRoutes);
-app.use("/api/roles", rolesRoutes);
-app.use("/api/courses", courseRoutes);
-app.use("/api/trainers", trainerRoutes);
-app.use("/api/certificates", certificateRoutes);
-app.use("/api/students", studentsRoutes);
-app.use("/api/categories", categoriesRoutes);
-app.use("/api/city", cityRoutes);
+// Public routes
+app.use("/api/auth", authRoutes);
 
+<<<<<<< HEAD
 
 // Endpoint to get counts
 app.get('/api/counts', (req, res) => {
@@ -67,7 +65,36 @@ app.get('/api/counts', (req, res) => {
 // Set up a basic route
 app.get("/", (req, res) => {
   res.send("Welcome to the Coders Academy API!");
+=======
+// Apply authentication middleware for protected routes
+app.use(authenticateUser);
+
+// Protected routes
+app.use('/api/users', roleMiddleware([4]), userRoutes);
+app.use('/api/roles', roleMiddleware([4]), rolesRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/trainers', trainerRoutes);
+app.use('/api/certificates', certificateRoutes);
+app.use('/api/students', studentsRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/city', cityRoutes);
+app.use("/api/assignment", assignmentRoutes);
+app.use("/api/counts", countRoutes);
+app.use('/api/exam', examRoutes);
+
+// Home route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Coders Academy API!');
+>>>>>>> d8a2b7053c1e486c948b3f8582982a17af4c29f8
 });
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });

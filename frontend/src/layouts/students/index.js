@@ -1,29 +1,34 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, Button, TextField,IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
-import MDBadge from "@mui/material/Badge";
+import MDBadge from "components/MDBadge";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
 import DataTable from "layouts/students/DataTable";
 import { Link } from "react-router-dom";
-import StudentForm from "layouts/students/form";
+import StudentsForm from "layouts/students/form";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useAuth } from "../../context/AuthContext";
 
 function Students() {
-  const [studentData, setstudentData] = useState([]);
+  const { user } = useAuth();
+  const [studentsData, setStudentsData] = useState([]);
+  const [cities, setCities] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deletestudentId, setDeletestudentId] = useState(null);
-  const [openCreateModal, setOpenCreateModal] = useState(false); // State for create modal
-  const [openUpdateModal, setOpenUpdateModal] = useState(false); // State for update modal
-  const [selectedstudent, setSelectedstudent] = useState(null); // State to store selected student for update
+  const [deleteStudentsId, setDeleteStudentsId] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [selectedStudents, setSelectedStudents] = useState(null);
 
-  const handleOpenDeleteModal = (studentId) => {
-    setDeletestudentId(studentId);
+  const handleOpenDeleteModal = (studentsId) => {
+    setDeleteStudentsId(studentsId);
     setOpenDeleteModal(true);
   };
 
@@ -31,15 +36,18 @@ function Students() {
     setOpenDeleteModal(false);
   };
 
-  const handleDeletestudent = async (studentId) => {
+  const handleDeleteStudents = async (studentsId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/students/${studentId}`, {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch(`http://localhost:8080/api/students/${studentsId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (response.ok) {
-        // Filter out the deleted student from the studentData state
-        setstudentData((prevData) => prevData.filter((item) => item.id !== studentId));
-        handleCloseDeleteModal(); // Close the delete modal after successful deletion
+        setStudentsData((prevData) => prevData.filter((item) => item.id !== studentsId));
+        handleCloseDeleteModal();
       } else {
         throw new Error("Failed to delete student");
       }
@@ -49,6 +57,7 @@ function Students() {
   };
 
   const handleOpenCreateModal = () => {
+    setSelectedStudents(null);
     setOpenCreateModal(true);
   };
 
@@ -56,15 +65,8 @@ function Students() {
     setOpenCreateModal(false);
   };
 
-  const handleCreatestudent = async (studentData) => {
-    // Handle creating student logic here
-    console.log("Create student data:", studentData);
-    handleCloseCreateModal();
-    fetchData();
-  };
-
-  const handleOpenUpdateModal = (student) => {
-    setSelectedstudent(student);
+  const handleOpenUpdateModal = (students) => {
+    setSelectedStudents(students);
     setOpenUpdateModal(true);
   };
 
@@ -72,53 +74,70 @@ function Students() {
     setOpenUpdateModal(false);
   };
 
-  const handleUpdatestudent = async (studentId, studentData) => {
-    // Handle updating student logic here
-    console.log("Update student data:", studentData);
-    handleCloseUpdateModal();
-    fetchData();
+  const handleUpdateStudents = async (studentsId, studentsData) => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch(`http://localhost:8080/api/students/${studentsId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(studentsData),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to update students");
+      }
+      fetchData(); // Refetch data after updating a students
+      handleCloseUpdateModal();
+    } catch (error) {
+      console.error("Error updating students:", error);
+    }
   };
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/students");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/students", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!response.ok) {
-        throw new Error("Failed to fetch data");
+        throw new Error("Failed to fetch data"); l
       }
       const data = await response.json();
-      // Update roleData state with the new data
       const formattedData = data.map((item) => ({
         id: item.id,
-        student: <Author firstName={item.firstName} lastName={item.lastName} />,
-        city: (
-          <MDBox ml={2}>
+        students: <Author firstName={item.firstName} lastName={item.lastName} />,
+        cities: (
+          <MDBox ml={-2}>
             <MDBadge badgeContent={item.City.name} />
           </MDBox>
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <Button
-              component={Link}
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
-              onClick={() => handleOpenUpdateModal(item)}
-            >
-              Edit
-            </Button>
-
-            <Button
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
-              onClick={() => handleOpenDeleteModal(item.id)}
-            >
-              Delete
-            </Button>
+            {user?.role === 4 && (
+              <>
+                <IconButton
+                  onClick={() => handleOpenUpdateModal(item)}
+                  sx={{ color: "grey", "&:hover": { color: "blue" } }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleOpenDeleteModal(item.id)}
+                  sx={{ color: "grey", "&:hover": { color: "red" } }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            )}
           </MDBox>
         ),
       }));
-      setstudentData(formattedData);
+      setStudentsData(formattedData);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -127,57 +146,31 @@ function Students() {
     }
   };
 
-  useEffect(() => {
-    fetch("http://localhost:8080/api/students")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
+  const fetchCities= async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/city", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         }
-        return response.json();
-      })
-      .then((data) => {
-        const formattedData = data.map((item) => ({
-          id: item.id,
-          student: <Author firstName={item.firstName} lastName={item.lastName} />,
-          city: (
-            <MDBox ml={2}>
-               <MDBadge badgeContent={item.City.name} />
-            </MDBox> 
-          ),
-          action: (
-            <MDBox display="flex" alignItems="center">
-              <Button
-                component={Link}
-                variant="caption"
-                fontWeight="medium"
-                sx={{ ml: 1 }}
-                onClick={() => handleOpenUpdateModal(item)}
-              >
-                Edit
-              </Button>
-
-              <Button
-                variant="caption"
-                fontWeight="medium"
-                sx={{ ml: 1 }}
-                onClick={() => handleOpenDeleteModal(item.id)}
-              >
-                Delete
-              </Button>
-            </MDBox>
-          ),
-        }));
-        setstudentData(formattedData);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false);
       });
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      setCities(data);
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    fetchCities();
   }, []);
 
-  const Author = ({ firstName, lastName }) => (
+  const Author = ({firstName,lastName }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDBox lineHeight={1}>
         <MDTypography display="block" variant="button" fontWeight="medium">
@@ -189,17 +182,19 @@ function Students() {
   );
 
   const columns = [
-    { Header: "Student", accessor: "student", width: "45%", align: "left" },
-    { Header: "City", accessor: "city", align: "left" },
+    { Header: "students", accessor: "students", width: "45%", align: "left" },
+    { Header: "cities", accessor: "cities", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -225,7 +220,7 @@ function Students() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: studentData }}
+                    table={{ columns, rows: studentsData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -246,25 +241,27 @@ function Students() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
-          <Button onClick={() => handleDeletestudent(deletestudentId)} color="error">
+          <Button onClick={() => handleDeleteStudents(deleteStudentsId)} color="error">
             Delete
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Create student Modal */}
-      <StudentForm
+      {/* Create course Modal */}
+      <StudentsForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={handleCreatestudent}
+        onSubmit={fetchData} // Directly fetch data after creation
+        cities={cities} // Pass categories to CourseForm
       />
 
-      {/* Update student Modal */}
-      <StudentForm
+      {/* Update course Modal */}
+      <StudentsForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(studentData) => handleUpdatestudent(selectedstudent.id, studentData)}
-        initialData={selectedstudent}
+        onSubmit={(studentsData) => handleUpdateStudents(selectedStudents.id, studentsData)}
+        initialData={selectedStudents}
+        cities={cities} // Pass categories to CourseForm
       />
     </DashboardLayout>
   );

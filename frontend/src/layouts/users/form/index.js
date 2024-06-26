@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import Select from "react-select";
 import {
   Dialog,
@@ -7,28 +8,41 @@ import {
   DialogActions,
   Button,
   TextField,
-  MenuItem,
 } from "@mui/material";
 
 function UserForm({ open, handleClose, onSubmit, initialData }) {
-  const [selectedOption] = useState(null);
   const [formData, setFormData] = useState(
-    initialData || { name: "", email: "", password: "", role: "" }
+    initialData || { name: "", email: "", password: "", roleId: "" }
   );
   const [roles, setRoles] = useState([]);
-  const rolesArray = [];
-  roles.forEach((role) => {
-    rolesArray.push({ value: role.id, label: role.title });
-  });
 
   useEffect(() => {
     if (!initialData && open) {
-      setFormData({ name: "", email: "", password: "", role: "" });
+      setFormData({ name: "", email: "", password: "", roleId: "" });
     } else if (initialData) {
       setFormData(initialData);
     }
     fetchRoles();
   }, [open, initialData]);
+
+  const fetchRoles = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/roles", {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data);
+      } else {
+        throw new Error("Failed to fetch roles");
+      }
+    } catch (error) {
+      console.error("Error fetching roles:", error);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,73 +60,37 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
     }));
   };
 
-  const handleCreateUser = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        handleClose();
-        onSubmit(formData);
-      } else {
-        throw new Error("Failed to create user");
-      }
-    } catch (error) {
-      console.error("Error creating user:", error);
-    }
-  };
-
-  const handleUpdateUser = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/users/${initialData.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        handleClose();
-        onSubmit(formData);
-      } else {
-        throw new Error("Failed to update user");
-      }
-    } catch (error) {
-      console.error("Error updating user:", error);
-    }
-  };
-
   const handleSubmit = async () => {
-    if (initialData) {
-      await handleUpdateUser();
-    } else {
-      await handleCreateUser();
-    }
-    fetchRoles();
-    handleClose();
-  };
-
-  const fetchRoles = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/roles");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const method = initialData ? "PUT" : "POST";
+      const url = initialData
+        ? `http://localhost:8080/api/users/${initialData.id}`
+        : "http://localhost:8080/api/users";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
       if (response.ok) {
-        const data = await response.json();
-        setRoles(data); // Assuming roles are stored in the database with properties: id and title
+        handleClose();
+        onSubmit(formData);
       } else {
-        throw new Error("Failed to fetch roles");
+        throw new Error(`Failed to ${initialData ? "update" : "create"} user`);
       }
     } catch (error) {
-      console.error("Error fetching roles:", error);
+      console.error(`Error ${initialData ? "updating" : "creating"} user:`, error);
     }
   };
 
   return (
     <Dialog
-      id='usersModal'
+      id="usersModal"
       open={open}
       onClose={handleClose}
       fullWidth={true}
@@ -154,18 +132,16 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
           value={formData.password}
           onChange={handleChange}
         />
-        <div className="App">
-          <Select
-            margin="dense"
-            name="roleId"
-            label="Role"
-            fullWidth
-            defaultValue={selectedOption}
-            onChange={handleRoleChange}
-            options={rolesArray}
-            menuPortalTarget={document.getElementById('usersModal')}
-          />
-        </div>
+        <Select
+          margin="dense"
+          name="roleId"
+          label="Role"
+          fullWidth
+          value={roles.find(role => role.value === formData.roleId)}
+          onChange={handleRoleChange}
+          options={roles.map(role => ({ value: role.id, label: role.title }))}
+          menuPortalTarget={document.getElementById('usersModal')}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
@@ -178,5 +154,12 @@ function UserForm({ open, handleClose, onSubmit, initialData }) {
     </Dialog>
   );
 }
+
+UserForm.propTypes = {
+  open: PropTypes.bool.isRequired,
+  handleClose: PropTypes.func.isRequired,
+  onSubmit: PropTypes.func.isRequired,
+  initialData: PropTypes.object,
+};
 
 export default UserForm;

@@ -1,22 +1,11 @@
-/**
-=========================================================
-* Material Dashboard 2 React - v2.2.0
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/material-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-
-Coded by www.creative-tim.com
-
- =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-*/import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import IconButton from '@mui/material/IconButton';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useAuth } from '../../context/AuthContext';
 
 // @mui material components
 import Grid from "@mui/material/Grid";
-
 
 // Material Dashboard 2 React components
 import MDBox from "components/MDBox";
@@ -36,12 +25,13 @@ import reportsLineChartData from "layouts/dashboard/data/reportsLineChartData";
 // Dashboard components
 import Projects from "layouts/dashboard/components/Projects";
 import OrdersOverview from "layouts/dashboard/components/OrdersOverview";
-import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
 
 function Dashboard() {
   const { sales, tasks } = reportsLineChartData;
-   // State to store the counts
-   const [counts, setCounts] = useState({
+  const { logout } = useAuth();
+  
+  // State to store the counts
+  const [counts, setCounts] = useState({
     courses: 0,
     trainers: 0,
     students: 0,
@@ -49,8 +39,9 @@ function Dashboard() {
   });
 
   const fetchCounts = () => {
-    axios.get('http://localhost:3000/api/counts')
+    axios.get('http://localhost:8080/api/counts')
       .then(response => {
+        console.log(response.data); // Debugging: Check what data is coming
         setCounts(response.data);
       })
       .catch(error => {
@@ -62,56 +53,14 @@ function Dashboard() {
     fetchCounts();
   }, []);
 
-  // Example function to handle adding a course
-  const addCourse = (courseData) => {
-    axios.post('http://localhost:3000/api/courses', courseData)
-      .then(response => {
-        console.log(response.data.message);
-        fetchCounts();  // Fetch counts after adding a course
-      })
-      .catch(error => {
-        console.error('There was an error adding the course!', error);
-      });
-  };
-
-  // Similar functions for adding trainers, students, and users
-  const addTrainer = (trainerData) => {
-    axios.post('http://localhost:3000/api/trainers', trainerData)
-      .then(response => {
-        console.log(response.data.message);
-        fetchCounts();
-      })
-      .catch(error => {
-        console.error('There was an error adding the trainer!', error);
-      });
-  };
-
-  const addStudent = (studentData) => {
-    axios.post('http://localhost:3000/api/students', studentData)
-      .then(response => {
-        console.log(response.data.message);
-        fetchCounts();
-      })
-      .catch(error => {
-        console.error('There was an error adding the student!', error);
-      });
-  };
-
-  const addUser = (userData) => {
-    axios.post('http://localhost:3000/api/users', userData)
-      .then(response => {
-        console.log(response.data.message);
-        fetchCounts();
-      })
-      .catch(error => {
-        console.error('There was an error adding the user!', error);
-      });
-  };
-
-
   return (
     <DashboardLayout>
       <DashboardNavbar />
+      <MDBox display="flex" justifyContent="flex-end" p={2}>
+        <IconButton color="inherit" onClick={logout}>
+          <LogoutIcon />
+        </IconButton>
+      </MDBox>
       <MDBox py={3}>
         <Grid container spacing={3}>
           <Grid item xs={12} md={6} lg={3}>
@@ -154,7 +103,6 @@ function Dashboard() {
                 title="All Users"
                 count={counts.users}
                 percentage={{ color: 'success' }}
-             
               />
             </MDBox>
           </Grid>

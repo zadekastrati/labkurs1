@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, Button, TextField,IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/roles/DataTable";
+import DataTable from "layouts/city/DataTable";
 import { Link } from "react-router-dom";
 import CityForm from "layouts/city/form";
+import { useAuth } from "../../context/AuthContext";
+
 
 function City() {
+  const { user } = useAuth();
   const [cityData, setCityData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,8 +37,12 @@ function City() {
 
   const handleDeleteCity = async (cityId) => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(`http://localhost:8080/api/city/${cityId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       if (response.ok) {
         handleCloseDeleteModal();
@@ -79,7 +88,12 @@ function City() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/city");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/city",{
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -96,24 +110,23 @@ function City() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <Button
-              component={Link}
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
-              onClick={() => handleOpenUpdateModal(item)}
-            >
-              Edit
-            </Button>
-            <Button
-              variant="caption"
-              fontWeight="medium"
-              sx={{ ml: 1 }}
-              onClick={() => handleOpenDeleteModal(item.id)}
-            >
-              Delete
-            </Button>
-          </MDBox>
+          {user?.role === 4 && (
+            <>
+              <IconButton
+                onClick={() => handleOpenUpdateModal(item)}
+                sx={{ color: "grey", "&:hover": { color: "blue" } }}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => handleOpenDeleteModal(item.id)}
+                sx={{ color: "grey", "&:hover": { color: "red" } }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </>
+          )}
+        </MDBox>
         ),
       }));
       setCityData(formattedData);
@@ -137,9 +150,11 @@ function City() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -207,7 +222,7 @@ function City() {
       <CityForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(roleData) => handleUpdateCity(selectedCity.id, cityData)}
+        onSubmit={(cityData) => handleUpdateCity(selectedCity.id, cityData)}
         initialData={selectedCity}
       />
     </DashboardLayout>

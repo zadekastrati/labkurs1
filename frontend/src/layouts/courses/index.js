@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogActions, Button, TextField } from "@mui/material";
+import { Dialog, DialogContent, DialogActions, Button, TextField,IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
@@ -13,8 +13,11 @@ import { Link } from "react-router-dom";
 import CourseForm from "layouts/courses/form";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useAuth } from "../../context/AuthContext";
+
 
 function Courses() {
+  const { user } = useAuth();
   const [courseData, setCourseData] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,8 +39,12 @@ function Courses() {
 
   const handleDeleteCourse = async (courseId) => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       if (response.ok) {
         setCourseData((prevData) => prevData.filter((item) => item.id !== courseId));
@@ -70,10 +77,12 @@ function Courses() {
 
   const handleUpdateCourse = async (courseId, courseData) => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(`http://localhost:8080/api/courses/${courseId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(courseData),
       });
@@ -89,7 +98,13 @@ function Courses() {
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/courses");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/courses", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -104,14 +119,22 @@ function Courses() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            <EditIcon
-              onClick={() => handleOpenUpdateModal(item)}
-              style={{ cursor: "pointer", marginRight: "24px", fontSize: "2.5rem" }}
-            />
-            <DeleteIcon
-              onClick={() => handleOpenDeleteModal(item.id)}
-              style={{ cursor: "pointer", fontSize: "2.5rem" }}
-            />
+            {user?.role === 4 && (
+              <>
+                <IconButton
+                  onClick={() => handleOpenUpdateModal(item)}
+                  sx={{ color: "grey", "&:hover": { color: "blue" } }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  onClick={() => handleOpenDeleteModal(item.id)}
+                  sx={{ color: "grey", "&:hover": { color: "red" } }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </>
+            )}
           </MDBox>
         ),
       }));
@@ -126,7 +149,13 @@ function Courses() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/categories");
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/categories", {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -138,43 +167,8 @@ function Courses() {
   };
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/courses")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch data");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        const formattedData = data.map((item) => ({
-          id: item.id,
-          course: <Author name={item.title} description={item.description} />,
-          category: (
-            <MDBox ml={2}>
-              <MDBadge badgeContent={item.Category.name}/>
-            </MDBox>
-          ),
-          action: (
-            <MDBox display="flex" alignItems="center">
-              <EditIcon
-                onClick={() => handleOpenUpdateModal(item)}
-                style={{ cursor: "pointer", marginRight: "24px", fontSize: "2.5rem" }}
-              />
-              <DeleteIcon
-                onClick={() => handleOpenDeleteModal(item.id)}
-                style={{ cursor: "pointer", fontSize: "2.5rem" }}
-              />
-            </MDBox>
-          ),
-        }));
-        setCourseData(formattedData);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false);
-      });
+    fetchData();
+    fetchCategories();
   }, []);
 
   const Author = ({ name, description }) => (
@@ -197,9 +191,11 @@ function Courses() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>

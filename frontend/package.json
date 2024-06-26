@@ -22,6 +22,7 @@
     "chroma-js": "2.4.2",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "jwt-decode": "^4.0.0",
     "mysql2": "^3.9.8",
     "prop-types": "15.8.1",
     "react": "^18.2.0",
@@ -60,6 +61,7 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "cross-env": "^7.0.3",
     "prettier": "2.8.8"
   },

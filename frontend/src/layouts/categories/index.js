@@ -1,206 +1,158 @@
 import React, { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  TextField,
-  DialogActions,
-  Button,
-  DialogTitle,
-} from "@mui/material";
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Dialog, DialogContent, DialogActions, Button, TextField,IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import Card from "@mui/material/Card";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/courses/DataTable";
+import DataTable from "layouts/categories/DataTable";
+import { Link } from "react-router-dom";
+import CategoriesForm from "layouts/categories/form";
+import Icon from '@mui/material/Icon';
+import { useAuth } from "../../context/AuthContext";
+
 
 function Categories() {
-  const [categoryData, setCategoryData] = useState([]);
+  const { user } = useAuth();
+  const [categoriesData, setCategoriesData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [openModal, setOpenModal] = useState(false);
-  const [newCategory, setNewCategory] = useState({ name: "" });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingCategory, setEditingCategory] = useState(null);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [deletingCategory, setDeletingCategory] = useState(null);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [deleteCategoriesId, setDeleteCategoriesId] = useState(null);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+  const [openUpdateModal, setOpenUpdateModal] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState(null);
 
-  const handleOpenModal = () => {
-    setNewCategory({ name: "" });
-    setIsEditing(false);
-    setOpenModal(true);
+  const handleOpenDeleteModal = (categoriesId) => {
+    setDeleteCategoriesId(categoriesId);
+    setOpenDeleteModal(true);
   };
 
-  const handleCloseModal = () => {
-    setNewCategory({ name: "" });
-    setIsEditing(false);
-    setOpenModal(false);
+  const handleCloseDeleteModal = () => {
+    setOpenDeleteModal(false);
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewCategory((prevState) => ({ ...prevState, [name]: value }));
-  };
-
-  const handleSubmit = async () => {
-    const url = isEditing
-      ? `http://localhost:8080/api/categories/${editingCategory.id}`
-      : "http://localhost:8080/api/categories";
-    const method = isEditing ? "PUT" : "POST";
-
+  const handleDeleteCategories = async (categoriesId) => {
     try {
-      const response = await fetch(url, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newCategory),
-      });
-      if (response.ok) {
-        handleCloseModal();
-        window.location.reload();
-        const updatedCategoryData = await response.json();
-        setCategoryData((currentData) => {
-          const newData = isEditing
-            ? currentData.map((category) =>
-              category.key === editingCategory.id ? { ...category, ...updatedCategoryData } : category
-              )
-            : [...currentData, formattedNewCategory(updatedCategoryData)];
-
-          console.log("New data array after update:", newData); // Log to verify the immediate update
-          return newData;
-        });
-        setRenderKey((prevKey) => prevKey + 1); // This is one way to force a rerender
-        setOpenModal(false);
-      } else {
-        console.error("HTTP error:", response.status);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/categories/${deletingCategory.id}`, {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch(`http://localhost:8080/api/categories/${categoriesId}`, {
         method: "DELETE",
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       if (response.ok) {
-        setCategoryData((currentData) =>
-          currentData.filter((category) => category.id !== deletingCategory.id)
-        );
-        setOpenDeleteDialog(false);
+        handleCloseDeleteModal();
+        fetchData();
       } else {
-        console.error("HTTP error:", response.status);
+        throw new Error("Failed to delete Categories");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error deleting Categories:", error);
     }
   };
 
-  const handleOpenDeleteDialog = (category) => {
-    setDeletingCategory(category);
-    setOpenDeleteDialog(true);
+  const handleOpenCreateModal = () => {
+    setOpenCreateModal(true);
   };
 
-  const handleCloseDeleteDialog = () => {
-    setDeletingCategory(null);
-    setOpenDeleteDialog(false);
+  const handleCloseCreateModal = () => {
+    setOpenCreateModal(false);
+  };
+
+  const handleCreateCategories = async (categoriesData) => {
+    console.log("Create role data:", categoriesData);
+    handleCloseCreateModal();
+    fetchData();
+  };
+
+  const handleOpenUpdateModal = (categories) => {
+    setSelectedCategories(categories);
+    setOpenUpdateModal(true);
+  };
+
+  const handleCloseUpdateModal = () => {
+    setOpenUpdateModal(false);
+  };
+
+  const handleUpdateCategories = async (categoriesId, categoriesData) => {
+    console.log("Update Categories data:", categoriesData);
+    handleCloseUpdateModal();
+    fetchData();
+  };
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const response = await fetch("http://localhost:8080/api/categories", {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+      const formattedData = data.map((item) => ({
+        id: item.id,
+        name: (
+          <MDBox display="flex" alignItems="center">
+            <MDTypography display="block" variant="button" fontWeight="medium">
+              {item.name}
+            </MDTypography>
+          </MDBox>
+        ),
+        action: (
+          <MDBox display="flex" alignItems="center">
+          {user?.role === 4 && (
+            <>
+              <IconButton
+                onClick={() => handleOpenUpdateModal(item)}
+                sx={{ color: "grey", "&:hover": { color: "blue" } }}
+              >
+                <EditIcon />
+              </IconButton>
+              <IconButton
+                onClick={() => handleOpenDeleteModal(item.id)}
+                sx={{ color: "grey", "&:hover": { color: "red" } }}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </>
+          )}
+        </MDBox>
+        ),
+      }));
+      setCategoriesData(formattedData);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const response = await fetch("http://localhost:8080/api/categories");
-        if (!response.ok) throw new Error("Failed to fetch data");
-        const data = await response.json();
-        setCategoryData(data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError(error);
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
 
   const columns = [
-    { Header: "Category Name", accessor: "name", align: "left" },
+    { Header: "Name", accessor: "name", width: "45%", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
-
-  const rows = categoryData.map((category) => ({
-    name: (
-      <MDBox display="flex" alignItems="center">
-        <MDTypography variant="button" fontWeight="medium">
-          {category.name}
-        </MDTypography>
-      </MDBox>
-    ),
-    action: (
-      <MDBox display="flex" alignItems="center">
-        <EditIcon 
-        onClick={()=>handleOpenEditModal(category)}
-        style={{cursor:"pointer",marginRight: "30px", fontSize: "5.5rem" }}
-        />
-        <DeleteIcon
-        onClick={()=> handleOpenDeleteDialog(category)}
-        style={{cursor:"pointer", fontSize: "1.5rem"}}
-        />
-        </MDBox>
-    ),
-  }));
-
-  const handleOpenEditModal = (category) => {
-    setNewCategory({ name: category.name });
-    setEditingCategory(category);
-    setIsEditing(true);
-    setOpenModal(true);
-  };
 
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      <Button onClick={handleOpenModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
-        Create
-      </Button>
-      <Dialog open={openModal} onClose={handleCloseModal}>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Category Name"
-            type="text"
-            fullWidth
-            variant="outlined"
-            name="name"
-            value={newCategory.name}
-            onChange={handleChange}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseModal}>Cancel</Button>
-          <Button onClick={handleSubmit}>{isEditing ? "Update" : "Create"}</Button>
-        </DialogActions>
-      </Dialog>
-      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Confirm Deletion</DialogTitle>
-        <DialogContent>
-          Are you sure you want to delete the category "{deletingCategory?.name}"?
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
-          <Button onClick={handleDelete} color="error">
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {user?.role === 4 && (
+        <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
+          Create
+        </Button>
+      )}
       <MDBox pt={6} pb={3}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
@@ -216,7 +168,7 @@ function Categories() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Categories
+                Categories
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -226,7 +178,7 @@ function Categories() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows }}
+                    table={{ columns, rows: categoriesData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -239,6 +191,38 @@ function Categories() {
         </Grid>
       </MDBox>
       <Footer />
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
+        <DialogContent>
+          <MDTypography>Are you sure you want to delete this Categories?</MDTypography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteModal}>Cancel</Button>
+          <Button
+            onClick={() => handleDeleteCategories(deleteCategoriesId)}
+            color="primary"
+            style={{ color: "#3583eb" }}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Create Role Modal */}
+      <CategoriesForm
+        open={openCreateModal}
+        handleClose={handleCloseCreateModal}
+        onSubmit={handleCreateCategories}
+      />
+
+      {/* Update Role Modal */}
+      <CategoriesForm
+        open={openUpdateModal}
+        handleClose={handleCloseUpdateModal}
+        onSubmit={(CategoriesData) => handleUpdateCategories(selectedCategories.id, CategoriesData)}
+        initialData={selectedCategories}
+      />
     </DashboardLayout>
   );
 }
