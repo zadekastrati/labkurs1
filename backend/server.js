@@ -28,20 +28,20 @@ db.sync()
   .catch((err) => console.error("Error connecting to database:", err));
 
 // Define routes
-app.use('/api/users', userRoutes);
-app.use('/api/roles', rolesRoutes);
-app.use('/api/courses', courseRoutes);
-app.use('/api/trainers', trainerRoutes);
-app.use('/api/certificates', certificateRoutes);
-app.use('/api/students', studentsRoutes);
-app.use('/api/categories', categoriesRoutes);
-app.use('/api/city', cityRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/roles", rolesRoutes);
+app.use("/api/courses", courseRoutes);
+app.use("/api/trainers", trainerRoutes);
+app.use("/api/certificates", certificateRoutes);
+app.use("/api/students", studentsRoutes);
+app.use("/api/categories", categoriesRoutes);
+app.use("/api/city", cityRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/assignment", assignmentRoutes);
 app.use("/api/counts", countRoutes); // Add this line
 
-app.get('/', (req, res) => {
-  res.send('Welcome to the Coders Academy API!');
+app.get("/", (req, res) => {
+  res.send("Welcome to the Coders Academy API!");
 });
 
 // Start the server
