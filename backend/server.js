@@ -37,6 +37,33 @@ app.use("/api/students", studentsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/city", cityRoutes);
 
+
+// Endpoint to get counts
+app.get('/api/counts', (req, res) => {
+  const counts = {};
+
+  const queries = [
+    { table: 'courses', key: 'courses' },
+    { table: 'trainers', key: 'trainers' },
+    { table: 'students', key: 'students' },
+    { table: 'users', key: 'users' }
+  ];
+
+  let completedQueries = 0;
+
+  queries.forEach(query => {
+    db.query(`SELECT COUNT(*) as count FROM ${query.table}`, (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      counts[query.key] = result[0].count;
+      completedQueries++;
+      if (completedQueries === queries.length) {
+        res.json(counts);
+      }
+    });
+  });
+});
 // Set up a basic route
 app.get("/", (req, res) => {
   res.send("Welcome to the Coders Academy API!");

@@ -8,6 +8,7 @@ import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
 import City from "layouts/city";
+import Profile from "layouts/profile";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -25,6 +26,14 @@ const routes = [
   },  
   {
     type: "collapse",
+    name: "Profile",
+    key: "profile",
+    icon: <FontAwesomeIcon icon={faGears} />,
+    route: "/profile",
+    component: <Profile />,
+  },
+  {
+    type: "collapse",
     name: "Users",
     key: "users",
     icon: <FontAwesomeIcon icon={faCircleUser} />,
@@ -38,14 +47,6 @@ const routes = [
     icon: <FontAwesomeIcon icon={faGears} />,
     route: "/roles",
     component: <Roles />,
-  },
-  {
-    type: "collapse",
-    name: "Trainers",
-    key: "trainers",
-    icon: <Icon fontSize="small">book</Icon>,
-    route: "/trainers",
-    component: <Trainers />,
   },
   {
     type: "collapse",
