@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const {db} = require("./config/db.config");
+const cookieParser = require("cookie-parser"); 
+const { db } = require("./config/db.config");
 const userRoutes = require("./routes/user.routes");
 const rolesRoutes = require("./routes/roles.routes");
 const courseRoutes = require("./routes/course.routes");
@@ -22,8 +23,12 @@ const app = express();
 const port = 8080;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000', // Update to match your client URL
+  credentials: true
+}));
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // Sync database

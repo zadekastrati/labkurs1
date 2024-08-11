@@ -252,7 +252,7 @@ function Users() {
         roles={roles} // Pass categories to CourseForm
       />
     </DashboardLayout>
-  );  
+  );
 }
 
 export default Users;

@@ -31,17 +31,20 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleCreate = async () => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch("http://localhost:8080/api/trainers", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        // const data = await response.json();
+        window.location.reload();
         handleClose();
-        onSubmit(formData);
+        // onSubmit(data);
       } else {
         throw new Error("Failed to create trainer");
       }
@@ -52,20 +55,23 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
 
   const handleUpdate = async () => {
     try {
+      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
       const response = await fetch(
         `http://localhost:8080/api/trainers/${initialData.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem('jwtToken')}` // Include token
+            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify(formData),
         }
       );
       if (response.ok) {
+        window.location.reload();
         handleClose();
-        onSubmit(formData);
+        // onSubmit(data);
+        // const data = await response.json();
       } else {
         throw new Error("Failed to update trainer");
       }
