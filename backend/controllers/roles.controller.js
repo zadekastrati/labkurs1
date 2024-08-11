@@ -1,20 +1,5 @@
 const Role = require("../models/roles.model.js");
 
-
-// middleware/roleMiddleware.js
-// const roleMiddleware = (requiredRoles) => {
-//   return (req, res, next) => {
-//     const userRole = req.user.role; // assuming req.user is populated with the logged-in user's details
-//     if (requiredRoles.includes(userRole)) {
-//       next();
-//     } else {
-//       res.status(403).json({ message: 'Access denied' });
-//     }
-//   };
-// };
-
-// module.exports = roleMiddleware;
-
 // Create a new role
 async function createRole(req, res) {
   try {

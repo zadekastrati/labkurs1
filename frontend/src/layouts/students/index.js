@@ -111,8 +111,8 @@ function Students() {
       const formattedData = data.map((item) => ({
         id: item.id,
         students: <Author firstName={item.firstName} lastName={item.lastName} />,
-        city: (
-          <MDBox ml={2}>
+        cities: (
+          <MDBox ml={-2}>
             <MDBadge badgeContent={item.City.name} />
           </MDBox>
         ),

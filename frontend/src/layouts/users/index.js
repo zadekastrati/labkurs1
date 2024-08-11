@@ -110,7 +110,7 @@ function Users() {
         id: item.id,
         users: <Author name={item.name} email={item.email} />,
         role: (
-          <MDBox ml={2}>
+          <MDBox ml={-2}>
             <MDBadge badgeContent={item.Role.title} />
           </MDBox>
         ),

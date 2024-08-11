@@ -51,34 +51,47 @@ function RoleForm({ open, handleClose, onSubmit, initialData }) {
       console.error("Error creating role:", error);
     }
   };
-
   const handleUpdate = async () => {
     try {
       const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      
+      // Ensure the token is present
+      if (!token) {
+        throw new Error('No token found in localStorage or sessionStorage');
+      }
+  
       const response = await fetch(
         `http://localhost:8080/api/roles/${initialData.id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            
+            'Authorization': `Bearer ${token}`,  // Include the Authorization header
           },
           body: JSON.stringify(formData),
         }
       );
+  
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+  
       if (response.ok) {
-        window.location.reload();
-        handleClose();
+        const responseBody = await response.text();
+        let data = {};
+        if (responseBody) {
+          data = JSON.parse(responseBody);
+        }
         onSubmit(data);
-        const data = await response.json();
+        handleClose();
       } else {
-        throw new Error("Failed to update role");
+        const errorText = await response.text();
+        throw new Error(`Failed to update role: ${response.status} ${response.statusText} - ${errorText}`);
       }
     } catch (error) {
       console.error("Error updating role:", error);
     }
-  };
-
+  };  
+  
   const handleSubmit = () => {
     if (initialData) {
       handleUpdate();
