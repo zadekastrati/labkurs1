@@ -248,6 +248,7 @@ function Trainers() {
       />
     </DashboardLayout>
   );
+ 
 }
 
 export default Trainers;
