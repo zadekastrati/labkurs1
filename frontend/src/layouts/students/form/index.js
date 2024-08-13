@@ -72,6 +72,7 @@ function StudentsForm({ open, handleClose, onSubmit, initialData, cities }) {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
+        window.location.reload();
         handleClose();
         onSubmit();
       } else {

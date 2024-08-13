@@ -8,12 +8,19 @@ import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
 import City from "layouts/city";
+
 import Assignments from "layouts/assignments";
 import Exam from "layouts/exam";
 // @mui icons
 import Icon from "@mui/material/Icon";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faGears, faCity, faPersonChalkboard,faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleUser,
+  faGears,
+  faCity,
+  faPersonChalkboard,
+  faPencilAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 const routes = [
   {
@@ -23,7 +30,8 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },    
+  },
+
   {
     type: "collapse",
     name: "Users",
@@ -100,7 +108,7 @@ const routes = [
     type: "collapse",
     name: "Exam",
     key: "exam",
-    icon: < FontAwesomeIcon icon={faPencilAlt}/>,
+    icon: <FontAwesomeIcon icon={faPencilAlt} />,
     route: "/exam",
     component: <Exam />,
   },

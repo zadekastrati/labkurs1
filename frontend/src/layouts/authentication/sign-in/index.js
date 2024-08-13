@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
@@ -15,6 +14,7 @@ import MDButton from "components/MDButton";
 import BasicLayout from "layouts/authentication/components/BasicLayout";
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 import { useAuth } from "../../../context/AuthContext";
+import axiosInstance from "../../../utils/axiosInstance"; // Import your custom Axios instance
 
 function Basic() {
   const [rememberMe, setRememberMe] = useState(false);
@@ -28,9 +28,9 @@ function Basic() {
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8080/api/auth/login", { email, password });
+      const response = await axiosInstance.post("/api/auth/login", { email, password });
       const { token, role } = response.data;
-  
+
       // Save token and role based on remember me status
       if (rememberMe) {
         localStorage.setItem('jwtToken', token); // Store the token in localStorage if 'Remember Me' is checked
@@ -39,19 +39,18 @@ function Basic() {
         sessionStorage.setItem('jwtToken', token); // Store the token in sessionStorage if 'Remember Me' is not checked
         sessionStorage.setItem('role', role); // Store the role in sessionStorage if 'Remember Me' is not checked
       }
-  
+
       // Set the token for future requests (optional here because it will be set on reload/app load)
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  
+      axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
       login(token);  // Update authentication state (assuming this function handles your context state)
-  
+
       navigate("/dashboard"); // Redirect to a protected route after successful login
     } catch (error) {
       console.error("Login failed:", error);
       alert("Login failed. Please check your credentials and try again.");
     }
   };
-  
 
   return (
     <BasicLayout image={bgImage}>
@@ -117,12 +116,19 @@ function Basic() {
                 &nbsp;&nbsp;Remember me
               </MDTypography>
             </MDBox>
+            
+            {/* Sign In button */}
             <MDBox mt={4} mb={1}>
               <MDButton variant="gradient" color="info" fullWidth type="submit">
                 Sign in
               </MDButton>
             </MDBox>
+            
+            {/* New Member? Sign Up Link */}
             <MDBox mt={3} mb={1} textAlign="center">
+              <MDTypography variant="button" color="text">
+                New Member? <Link to="/register">Sign up</Link>
+              </MDTypography>
             </MDBox>
           </MDBox>
         </MDBox>
