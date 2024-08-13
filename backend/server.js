@@ -15,6 +15,7 @@ const authRoutes = require("./routes/auth.routes");
 const assignmentRoutes = require("./routes/assignments.routes");
 const countRoutes = require("./routes/count.routes");
 const examRoutes = require("./routes/exam.routes");
+const scholarshipRoutes = require("./routes/scholarship.routes");
 
 const authenticateUser = require("./middleware/authenticateUser");
 const roleMiddleware = require("./middleware/roleMiddleware");
@@ -91,6 +92,7 @@ app.use("/api/city", cityRoutes);
 app.use("/api/assignment", assignmentRoutes);
 app.use("/api/counts", countRoutes);
 app.use("/api/exam", examRoutes);
+app.use('/api/schoolarships', scholarshipRoutes);
 
 // Home route (This seems redundant; you may want to remove one)
 app.get("/", (req, res) => {
