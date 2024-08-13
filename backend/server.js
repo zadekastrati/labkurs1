@@ -7,6 +7,7 @@ const rolesRoutes = require("./routes/roles.routes");
 const courseRoutes = require("./routes/course.routes");
 const trainerRoutes = require("./routes/trainer.routes");
 const certificateRoutes = require("./routes/certificate.routes");
+const classroomRoutes = require("./routes/classroom.routes");
 const studentsRoutes = require("./routes/students.routes");
 const categoriesRoutes = require("./routes/categories.routes");
 const cityRoutes = require("./routes/city.routes");
@@ -50,6 +51,7 @@ app.get("/api/counts", (req, res) => {
     { table: "trainers", key: "trainers" },
     { table: "students", key: "students" },
     { table: "users", key: "users" },
+    { table: "classroom", key: "classrooms" },
   ];
 
   let completedQueries = 0;
@@ -82,6 +84,7 @@ app.use("/api/roles", roleMiddleware([4]), rolesRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/certificates", certificateRoutes);
+app.use("/api/classroom", classroomRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/city", cityRoutes);
