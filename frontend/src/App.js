@@ -22,6 +22,7 @@ import Students from './layouts/students';
 import Trainers from './layouts/trainers';
 import Assignments from './layouts/assignments';
 import Exam from './layouts/exam';
+import Scholarship from './layouts/scholarships';
 import Unauthorized from './layouts/Unauthorized/index.js'; 
 import { AuthProvider } from "./context/AuthContext";
 // import { useAuth } from './context/AuthContext';
@@ -101,6 +102,7 @@ export default function App() {
           <Route path="/city" element={<ProtectedRoute><City /></ProtectedRoute>} />
           <Route path="/assignments" element={<ProtectedRoute><Assignments /></ProtectedRoute>} />
           <Route path="/exam" element={<ProtectedRoute><Exam/></ProtectedRoute>}/>
+          <Route path="/scholarship" element={<ProtectedRoute><Scholarship/></ProtectedRoute>}/>
           <Route path="/unauthorized" element={<Unauthorized />} /> {/* Add this route */}
           <Route path="/" element={<Navigate to="/dashboard" />} />
           <Route path="*" element={<Navigate to="/login" />} /> {/* Redirect to login for any unknown routes */}
