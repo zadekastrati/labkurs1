@@ -8,16 +8,19 @@ import Course from "layouts/courses";
 import Categories from "layouts/categories";
 import Students from "layouts/students";
 import City from "layouts/city";
-<<<<<<< HEAD
-import Profile from "layouts/profile";
-=======
+
 import Assignments from "layouts/assignments";
 import Exam from "layouts/exam";
->>>>>>> d8a2b7053c1e486c948b3f8582982a17af4c29f8
 // @mui icons
 import Icon from "@mui/material/Icon";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faGears, faCity, faPersonChalkboard,faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCircleUser,
+  faGears,
+  faCity,
+  faPersonChalkboard,
+  faPencilAlt,
+} from "@fortawesome/free-solid-svg-icons";
 
 const routes = [
   {
@@ -27,15 +30,8 @@ const routes = [
     icon: <Icon fontSize="small">dashboard</Icon>,
     route: "/dashboard",
     component: <Dashboard />,
-  },    
-  {
-    type: "collapse",
-    name: "Profile",
-    key: "profile",
-    icon: <FontAwesomeIcon icon={faGears} />,
-    route: "/profile",
-    component: <Profile />,
   },
+
   {
     type: "collapse",
     name: "Users",
@@ -54,8 +50,6 @@ const routes = [
   },
   {
     type: "collapse",
-<<<<<<< HEAD
-=======
     name: "Trainers",
     key: "trainers",
     icon: <FontAwesomeIcon icon={faPersonChalkboard} />,
@@ -64,7 +58,6 @@ const routes = [
   },
   {
     type: "collapse",
->>>>>>> d8a2b7053c1e486c948b3f8582982a17af4c29f8
     name: "Certificates",
     key: "certificates",
     icon: <Icon fontSize="small">book</Icon>,
@@ -115,7 +108,7 @@ const routes = [
     type: "collapse",
     name: "Exam",
     key: "exam",
-    icon: < FontAwesomeIcon icon={faPencilAlt}/>,
+    icon: <FontAwesomeIcon icon={faPencilAlt} />,
     route: "/exam",
     component: <Exam />,
   },
