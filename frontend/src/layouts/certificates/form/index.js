@@ -51,7 +51,7 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },
         body: JSON.stringify(formData),
       });
@@ -72,7 +72,7 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
         },
         body: JSON.stringify(formData),
       });
@@ -102,8 +102,8 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
     try {
       const response = await fetch("http://localhost:8080/api/trainers", {
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
-        }
+          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
+        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -135,6 +135,7 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
       <DialogTitle>{initialData ? "Edit Certificate" : "Create Certificate"}</DialogTitle>
       <DialogContent>
         <TextField
+          autoFocus
           margin="dense"
           name="studentsName"
           label="Students Name"

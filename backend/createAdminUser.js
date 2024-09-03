@@ -17,13 +17,13 @@ async function createAdminUser() {
       console.log("Admin role already exists.");
     }
 
-    // Create the admin user
-    const adminUser = await User.create({
-      name: "Erolina Bunjaku",
-      email: "erolina.bunjaku@gmail.com",
-      roleId: adminRole.id,
-      password: "erolina123.", // This will be hashed automatically by the model hooks
-    });
+      // Create the admin user
+      const adminUser = await User.create({
+        name: 'Erina Koxha',
+        email: 'erina.koxha@gmail.com', // Use a different email address
+        roleId: adminRole.id,
+        password: 'Erina123.', // This will be hashed automatically by the model hooks
+      });
 
     console.log("Admin user created successfully:", adminUser);
   } catch (error) {
@@ -34,10 +34,11 @@ async function createAdminUser() {
       await db.close();
       console.log("Database connection closed.");
     } catch (error) {
-      console.error("Error closing the database connection:", error);
+      console.error('Error creating admin user:', error);
+    } finally {
+      db.close();
     }
-  }
-}
-
-// Run the function to create the admin user
-createAdminUser();
+  })
+  .catch((error) => {
+    console.error('Error connecting to the database:', error);
+  });
