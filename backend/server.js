@@ -44,6 +44,8 @@ db.sync()
 // Public routes
 app.use("/api/auth", authRoutes);
 
+<<<<<<< HEAD
+=======
 // Endpoint to get counts
 app.get("/api/counts", (req, res) => {
   const counts = {};
@@ -77,6 +79,7 @@ app.get("/", (req, res) => {
   res.send("Welcome to the Coders Academy API!");
 }); // <-- Missing bracket added here
 
+>>>>>>> 2adcbad404284a4bf42a99ffb99f4d0296a215ce
 // Apply authentication middleware for protected routes
 app.use(authenticateUser);
 
@@ -96,9 +99,15 @@ app.use("/api/counts", countRoutes);
 app.use("/api/exam", examRoutes);
 app.use('/api/schoolarships', scholarshipRoutes);
 
+<<<<<<< HEAD
+// Home route
+app.get('/', (req, res) => {
+  res.send('Welcome to the Coders Academy API!');
+=======
 // Home route (This seems redundant; you may want to remove one)
 app.get("/", (req, res) => {
   res.send("Welcome to the Coders Academy API!");
+>>>>>>> 2adcbad404284a4bf42a99ffb99f4d0296a215ce
 });
 
 // Error handling middleware
