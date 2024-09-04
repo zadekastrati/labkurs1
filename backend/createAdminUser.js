@@ -1,4 +1,3 @@
-// createAdminUser.js
 const { db } = require("./config/db.config"); // Adjust the path as needed
 const User = require("./models/user.model");
 const Role = require("./models/roles.model");
@@ -17,13 +16,13 @@ async function createAdminUser() {
       console.log("Admin role already exists.");
     }
 
-      // Create the admin user
-      const adminUser = await User.create({
-        name: 'Erina Koxha',
-        email: 'erina.koxha@gmail.com', // Use a different email address
-        roleId: adminRole.id,
-        password: 'Erina123.', // This will be hashed automatically by the model hooks
-      });
+    // Create the admin user
+    const adminUser = await User.create({
+      name: 'Leonita Bunjaku',
+      email: 'leonita.bunjaku@gmail.com', // Use a different email address
+      roleId: adminRole.id,
+      password: 'Leonita123.', // This will be hashed automatically by the model hooks
+    });
 
     console.log("Admin user created successfully:", adminUser);
   } catch (error) {
@@ -34,11 +33,11 @@ async function createAdminUser() {
       await db.close();
       console.log("Database connection closed.");
     } catch (error) {
-      console.error('Error creating admin user:', error);
-    } finally {
-      db.close();
+      console.error('Error closing the database connection:', error);
     }
-  })
-  .catch((error) => {
-    console.error('Error connecting to the database:', error);
-  });
+  }
+}
+
+// Call the function
+createAdminUser();
+
