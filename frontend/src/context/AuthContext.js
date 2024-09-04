@@ -11,23 +11,34 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuthStatus = () => {
-      const token = localStorage.getItem('jwtToken') || sessionStorage.getItem('jwtToken');
+      const token = localStorage.getItem('jwtToken');
       const logoutFlag = localStorage.getItem('logout');
       
+      console.log('Checking auth status...');
+      console.log('Token:', token);
+      console.log('Logout flag:', logoutFlag);
+
       if (token) {
-        const decodedToken = jwtDecode(token);
-        const isTokenExpired = Date.now() >= decodedToken.exp * 1000;
-        
-        if (isTokenExpired) {
-          console.log('Token expired');
+        try {
+          const decodedToken = jwtDecode(token);
+          const isTokenExpired = Date.now() >= decodedToken.exp * 1000;
+          
+          if (isTokenExpired) {
+            console.log('Token expired');
+            localStorage.removeItem('jwtToken');
+            setIsAuthenticated(false);
+            setUser(null);
+          } else {
+            console.log('Token valid, setting user and isAuthenticated');
+            setIsAuthenticated(true);
+            setUser(decodedToken); // Set user details
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          }
+        } catch (error) {
+          console.error('Invalid token:', error);
           localStorage.removeItem('jwtToken');
-          sessionStorage.removeItem('jwtToken');
           setIsAuthenticated(false);
           setUser(null);
-        } else {
-          setIsAuthenticated(true);
-          setUser(decodedToken); // Set user details
-          axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         }
       } else if (logoutFlag) {
         console.log('Logout flag detected, setting isAuthenticated to false');
@@ -35,6 +46,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(false);
         setUser(null);
       } else {
+        console.log('No token or logout flag, setting isAuthenticated to false');
         setIsAuthenticated(false);
         setUser(null);
       }
@@ -46,6 +58,7 @@ export const AuthProvider = ({ children }) => {
   
   useEffect(() => {
     const handleStorageChange = (event) => {
+      console.log('Storage event:', event);
       if (event.key === 'logout') {
         console.log('Logout event detected, setting isAuthenticated to false');
         setIsAuthenticated(false);
@@ -71,12 +84,42 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     console.log('Logout called');
     localStorage.removeItem("jwtToken");
-    sessionStorage.removeItem("jwtToken");
-    window.localStorage.setItem('logout', Date.now());
+    window.localStorage.setItem('logout', Date.now().toString());
     delete axios.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
     setUser(null);
   };
+
+  // Function to check token expiry and refresh it if needed
+  const checkTokenExpiry = async () => {
+    const token = localStorage.getItem('jwtToken');
+    if (!token) return;
+
+    const decodedToken = jwtDecode(token);
+    const expiryTime = decodedToken.exp * 1000;
+    const currentTime = Date.now();
+    const timeLeft = expiryTime - currentTime;
+
+    if (timeLeft < 5 * 60 * 1000) { // Refresh the token if less than 5 minutes left
+      try {
+        const response = await axios.post('http://localhost:8080/api/auth/refreshToken');
+        const newToken = response.data.token;
+        localStorage.setItem('jwtToken', newToken);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        const newDecodedToken = jwtDecode(newToken); // Decode the new token
+        setUser(newDecodedToken); // Update user details with the new token
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error refreshing token:', error);
+        logout();
+      }
+    }
+  };
+
+  useEffect(() => {
+    const intervalId = setInterval(checkTokenExpiry, 60 * 1000); // Check every minute
+    return () => clearInterval(intervalId);
+  }, []);
 
   const value = useMemo(() => ({
     isAuthenticated,

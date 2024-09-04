@@ -112,7 +112,6 @@ function TrainerForm({ open, handleClose, onSubmit, initialData }) {
           onChange={handleChange}
         />
         <TextField
-          autoFocus
           margin="dense"
           name="specialization"
           label="Specialization"

@@ -119,7 +119,7 @@ function Courses() {
         ),
         action: (
           <MDBox display="flex" alignItems="center">
-            {user?.role === 4 && (
+            {user?.role === 11 && (
               <>
                 <IconButton
                   onClick={() => handleOpenUpdateModal(item)}
@@ -191,7 +191,7 @@ function Courses() {
   return (
     <DashboardLayout>
       <DashboardNavbar />
-      {user?.role === 4 && (
+      {user?.role === 11 && (
         <Button onClick={handleOpenCreateModal} variant="contained" color="inherit" sx={{ ml: 2 }}>
           Create
         </Button>
