@@ -1,22 +1,26 @@
 const Course = require("../models/course.model.js");
-const Exam = require('../models/exam.model.js');
+const Exam = require("../models/exam.model.js");
 
 // Create a new course with validation
 async function createExam(req, res) {
   console.log(req.body);
   const { name, courseId } = req.body;
   if (!name || !courseId) {
-    return res.status(400).json({ message: 'All fields (name, description, courseId) are required.' });
+    return res
+      .status(400)
+      .json({
+        message: "All fields (name, description, courseId) are required.",
+      });
   }
 
   try {
     // Check if the courseId exists in the categories table
     const course = await Course.findByPk(courseId);
     if (!course) {
-      return res.status(400).json({ message: 'Invalid courseId' });
+      return res.status(400).json({ message: "Invalid courseId" });
     }
 
-    const exam = await Exam.create({ name,  courseId });
+    const exam = await Exam.create({ name, courseId });
     res.status(201).json(exam);
   } catch (err) {
     res.status(500).json({ message: `Error creating course: ${err.message}` });
@@ -30,7 +34,7 @@ exports.createExam = createExam;
 async function getAllExam(req, res) {
   try {
     const exam = await Exam.findAll({
-      include: Course
+      include: Course,
     });
     res.status(200).json(exam);
   } catch (err) {
@@ -44,7 +48,7 @@ async function getExamById(req, res) {
   const id = req.params.id;
   try {
     const exam = await Exam.findByPk(id, {
-      include: Course
+      include: Course,
     });
     if (!exam) {
       res.status(404).json({ message: `Course with id ${id} not found.` });
@@ -90,4 +94,4 @@ async function deleteExam(req, res) {
     res.status(500).json({ message: err.message });
   }
 }
-exports.deleteExam= deleteExam;
+exports.deleteExam = deleteExam;
