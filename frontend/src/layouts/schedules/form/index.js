@@ -9,24 +9,24 @@ import {
   TextField,
 } from "@mui/material";
 
-function CertificateForm({ open, handleClose, onSubmit, initialData }) {
-  const [selectedOption] = useState(null);
+function ScheduleForm({ open, handleClose, onSubmit, initialData }) {
   const [formData, setFormData] = useState(
-    initialData || { studentsName: "", courseType: "", date: "", trainer: "" }
+    initialData || { studentName: "", courseType: "", date: "", trainerId: "" }
   );
   const [trainers, setTrainers] = useState([]);
-  const trainersArray = [];
-  trainers.forEach((trainer) => {
-    trainersArray.push({ value: trainer.id, label: trainer.trainersName });
-  });
+  const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
-    if (!initialData && open) {
-      setFormData({ trainersName: "", studentsName: "", courseType: "", date: "", trainer: "" });
-    } else if (initialData) {
-      setFormData(initialData);
+    if (open) {
+      if (initialData) {
+        setFormData(initialData);
+        setSelectedOption({ value: initialData.trainerId, label: initialData.trainerName });
+      } else {
+        setFormData({ studentName: "", courseType: "", date: "", trainerId: "" });
+        setSelectedOption(null);
+      }
+      fetchTrainers();
     }
-    fetchTrainers();
   }, [open, initialData]);
 
   const handleChange = (e) => {
@@ -37,18 +37,23 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
     }));
   };
 
-  const handleTrainerChange = (e) => {
-    const value = e.value;
+  const handleTrainerChange = (selectedOption) => {
     setFormData((prevData) => ({
       ...prevData,
-      trainerId: value,
+      trainerId: selectedOption ? selectedOption.value : "",
     }));
+    setSelectedOption(selectedOption);
   };
 
-  const handleCreateCertificate = async () => {
+  const handleCreateOrUpdateSchedule = async () => {
+    const url = initialData
+      ? `http://localhost:8080/api/schedules/${initialData.id}`
+      : "http://localhost:8080/api/schedules";
+    const method = initialData ? "PUT" : "POST";
+
     try {
-      const response = await fetch("http://localhost:8080/api/certificates", {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
@@ -59,43 +64,12 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
         handleClose();
         onSubmit(formData);
       } else {
-        throw new Error("Failed to create certificate");
+        throw new Error(`Failed to ${initialData ? "update" : "create"} schedule`);
       }
     } catch (error) {
-      console.error("Error creating certificate:", error);
+      console.error("Error:", error);
+      // Consider displaying an error message to the user
     }
-  };
-
-  const handleUpdateCertificate = async () => {
-    try {
-      const response = await fetch(`http://localhost:8080/api/certificates/${initialData.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("jwtToken")}`,
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        handleClose();
-        onSubmit(formData);
-      } else {
-        throw new Error("Failed to update certificate");
-      }
-    } catch (error) {
-      console.error("Error updating certificate:", error);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (initialData) {
-      await handleUpdateCertificate();
-    } else {
-      await handleCreateCertificate();
-    }
-    // Refetch data after creating/updating certificate
-    fetchTrainers();
-    handleClose();
   };
 
   const fetchTrainers = async () => {
@@ -107,7 +81,10 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
       });
       if (response.ok) {
         const data = await response.json();
-        setTrainers(data); // Assuming trainers are stored in the database with properties: id and title
+        setTrainers(data.map((trainer) => ({
+          value: trainer.id,
+          label: trainer.trainerName,
+        })));
       } else {
         throw new Error("Failed to fetch trainers");
       }
@@ -118,29 +95,26 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
 
   return (
     <Dialog
-      id="certificatesModal"
       open={open}
       onClose={handleClose}
-      fullWidth={true}
-      maxWidth="false"
+      fullWidth
+      maxWidth="sm"
       PaperProps={{
         style: {
-          width: "30vw",
-          maxWidth: "none",
           position: "absolute",
           top: "10%",
         },
       }}
     >
-      <DialogTitle>{initialData ? "Edit Certificate" : "Create Certificate"}</DialogTitle>
+      <DialogTitle>{initialData ? "Edit Schedule" : "Create Schedule"}</DialogTitle>
       <DialogContent>
         <TextField
           autoFocus
           margin="dense"
-          name="studentsName"
-          label="Students Name"
+          name="studentName"
+          label="Student's Name"
           fullWidth
-          value={formData.studentsName}
+          value={formData.studentName}
           onChange={handleChange}
         />
         <TextField
@@ -155,29 +129,27 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
           margin="dense"
           name="date"
           label="Date"
+          type="date"
+          InputLabelProps={{ shrink: true }}
           fullWidth
           value={formData.date}
           onChange={handleChange}
         />
-
-        <div className="App">
-          <Select
-            margin="dense"
-            name="trainerId"
-            label="Trainer"
-            fullWidth
-            defaultValue={selectedOption}
-            onChange={handleTrainerChange}
-            options={trainersArray}
-            menuPortalTarget={document.getElementById("certificatesModal")}
-          />
-        </div>
+        <Select
+          name="trainerId"
+          label="Trainer"
+          fullWidth
+          value={selectedOption}
+          onChange={handleTrainerChange}
+          options={trainers}
+          placeholder="Select Trainer"
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleSubmit} color="primary" style={{ color: "#3583eb" }}>
+        <Button onClick={handleCreateOrUpdateSchedule} color="primary" style={{ color: "#3583eb" }}>
           {initialData ? "Update" : "Create"}
         </Button>
       </DialogActions>
@@ -185,4 +157,4 @@ function CertificateForm({ open, handleClose, onSubmit, initialData }) {
   );
 }
 
-export default CertificateForm;
+export default ScheduleForm;
