@@ -1,44 +1,106 @@
-// prop-types is a library for typechecking of props
-import PropTypes from "prop-types";
+// ScheduleForm.js
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
+import axios from 'axios';
 
-// Material Dashboard 2 React components
-import MDBox from "components/MDBox";
+function ScheduleForm({ schedule, onSubmit, onCancel }) {
+  const [formData, setFormData] = useState({
+    scheduleName: '',
+    classroomId: '',
+    startTime: '',
+    endTime: '',
+  });
+  const [classrooms, setClassrooms] = useState([]);
 
-function DataTableBodyCell({ noBorder, align, children }) {
+  useEffect(() => {
+    axios.get('/api/classrooms').then((response) => setClassrooms(response.data));
+    if (schedule) {
+      setFormData({
+        scheduleName: schedule.scheduleName,
+        classroomId: schedule.classroomId,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime,
+      });
+    }
+  }, [schedule]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
   return (
-    <MDBox
-      component="td"
-      textAlign={align}
-      py={1.5}
-      px={3}
-      sx={({ palette: { light }, typography: { size }, borders: { borderWidth } }) => ({
-        fontSize: size.sm,
-        borderBottom: noBorder ? "none" : `${borderWidth[1]} solid ${light.main}`,
-      })}
-    >
-      <MDBox
-        display="inline-block"
-        width="max-content"
-        color="text"
-        sx={{ verticalAlign: "middle" }}
-      >
-        {children}
-      </MDBox>
-    </MDBox>
+    <form onSubmit={handleSubmit}>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
+          <TextField
+            fullWidth
+            label="Schedule Name"
+            name="scheduleName"
+            value={formData.scheduleName}
+            onChange={handleChange}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <FormControl fullWidth required>
+            <InputLabel>Classroom</InputLabel>
+            <Select
+              name="classroomId"
+              value={formData.classroomId}
+              onChange={handleChange}
+            >
+              {classrooms.map((classroom) => (
+                <MenuItem key={classroom.id} value={classroom.id}>
+                  {classroom.classroomName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            fullWidth
+            label="Start Time"
+            type="datetime-local"
+            name="startTime"
+            value={formData.startTime}
+            onChange={handleChange}
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <TextField
+            fullWidth
+            label="End Time"
+            type="datetime-local"
+            name="endTime"
+            value={formData.endTime}
+            onChange={handleChange}
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">Submit</Button>
+          <Button type="button" variant="outlined" color="secondary" onClick={onCancel}>Cancel</Button>
+        </Grid>
+      </Grid>
+    </form>
   );
 }
 
-// Setting default values for the props of DataTableBodyCell
-DataTableBodyCell.defaultProps = {
-  noBorder: false,
-  align: "left",
+ScheduleForm.propTypes = {
+  schedule: PropTypes.object,
+  onSubmit: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
-// Typechecking props for the DataTableBodyCell
-DataTableBodyCell.propTypes = {
-  children: PropTypes.node.isRequired,
-  noBorder: PropTypes.bool,
-  align: PropTypes.oneOf(["left", "right", "center"]),
-};
-
-export default DataTableBodyCell;
+export default ScheduleForm;
