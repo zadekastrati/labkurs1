@@ -1,90 +1,98 @@
-// prop-types is a library for typechecking of props
-import PropTypes from "prop-types";
+// ScheduleTable.js
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import MDBox from 'components/MDBox';
+import DataTableBodyCell from './DataTableBodyCell';
+import DataTableHeadCell from './DataTableHeadCell';
+import axios from 'axios'; // For making HTTP requests
 
-// @mui material components
-import Icon from "@mui/material/Icon";
+function ScheduleTable({ schedules, onEdit, onDelete }) {
+  const [sortedColumn, setSortedColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState("none");
 
-// Material Dashboard 2 React components
-import MDBox from "components/MDBox";
+  const handleSort = (column) => {
+    const newDirection = sortDirection === "asce" ? "desc" : "asce";
+    setSortedColumn(column);
+    setSortDirection(newDirection);
+    // Assuming schedules are sorted by the backend
+    // If sorting on frontend, use a function to sort schedules here
+  };
 
-// Material Dashboard 2 React contexts
-import { useMaterialUIController } from "context";
-
-function DataTableHeadCell({ width, children, sorted, align, ...rest }) {
-  const [controller] = useMaterialUIController();
-  const { darkMode } = controller;
+  const sortedSchedules = [...schedules].sort((a, b) => {
+    if (!sortedColumn) return 0;
+    const aValue = a[sortedColumn];
+    const bValue = b[sortedColumn];
+    if (aValue < bValue) return sortDirection === "asce" ? -1 : 1;
+    if (aValue > bValue) return sortDirection === "asce" ? 1 : -1;
+    return 0;
+  });
 
   return (
-    <MDBox
-      component="th"
-      width={width}
-      py={1.5}
-      px={3}
-      sx={({ palette: { light }, borders: { borderWidth } }) => ({
-        borderBottom: `${borderWidth[1]} solid ${light.main}`,
-      })}
-    >
-      <MDBox
-        {...rest}
-        position="relative"
-        textAlign={align}
-        color={darkMode ? "white" : "secondary"}
-        opacity={0.7}
-        sx={({ typography: { size, fontWeightBold } }) => ({
-          fontSize: size.xxs,
-          fontWeight: fontWeightBold,
-          textTransform: "uppercase",
-          cursor: sorted && "pointer",
-          userSelect: sorted && "none",
-        })}
-      >
-        {children}
-        {sorted && (
-          <MDBox
-            position="absolute"
-            top={0}
-            right={align !== "right" ? "16px" : 0}
-            left={align === "right" ? "-5px" : "unset"}
-            sx={({ typography: { size } }) => ({
-              fontSize: size.lg,
-            })}
-          >
-            <MDBox
-              position="absolute"
-              top={-6}
-              color={sorted === "asce" ? "text" : "secondary"}
-              opacity={sorted === "asce" ? 1 : 0.5}
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <DataTableHeadCell
+              width="auto"
+              sorted={sortedColumn === "scheduleName" ? sortDirection : "none"}
+              align="left"
+              onClick={() => handleSort("scheduleName")}
             >
-              <Icon>arrow_drop_up</Icon>
-            </MDBox>
-            <MDBox
-              position="absolute"
-              top={0}
-              color={sorted === "desc" ? "text" : "secondary"}
-              opacity={sorted === "desc" ? 1 : 0.5}
+              Schedule Name
+            </DataTableHeadCell>
+            <DataTableHeadCell
+              width="auto"
+              sorted={sortedColumn === "classroomName" ? sortDirection : "none"}
+              align="left"
+              onClick={() => handleSort("classroomName")}
             >
-              <Icon>arrow_drop_down</Icon>
-            </MDBox>
-          </MDBox>
-        )}
-      </MDBox>
-    </MDBox>
+              Classroom
+            </DataTableHeadCell>
+            <DataTableHeadCell
+              width="auto"
+              sorted={sortedColumn === "startTime" ? sortDirection : "none"}
+              align="left"
+              onClick={() => handleSort("startTime")}
+            >
+              Start Time
+            </DataTableHeadCell>
+            <DataTableHeadCell
+              width="auto"
+              sorted={sortedColumn === "endTime" ? sortDirection : "none"}
+              align="left"
+              onClick={() => handleSort("endTime")}
+            >
+              End Time
+            </DataTableHeadCell>
+            <DataTableHeadCell width="auto" align="left">
+              Actions
+            </DataTableHeadCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {sortedSchedules.map((schedule) => (
+            <TableRow key={schedule.id}>
+              <DataTableBodyCell>{schedule.scheduleName}</DataTableBodyCell>
+              <DataTableBodyCell>{schedule.classroom?.classroomName}</DataTableBodyCell>
+              <DataTableBodyCell>{new Date(schedule.startTime).toLocaleString()}</DataTableBodyCell>
+              <DataTableBodyCell>{new Date(schedule.endTime).toLocaleString()}</DataTableBodyCell>
+              <DataTableBodyCell>
+                <Button variant="contained" color="primary" onClick={() => onEdit(schedule)}>Edit</Button>
+                <Button variant="contained" color="secondary" onClick={() => onDelete(schedule.id)}>Delete</Button>
+              </DataTableBodyCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
 
-// Setting default values for the props of DataTableHeadCell
-DataTableHeadCell.defaultProps = {
-  width: "auto",
-  sorted: "none",
-  align: "left",
+ScheduleTable.propTypes = {
+  schedules: PropTypes.array.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
-// Typechecking props for the DataTableHeadCell
-DataTableHeadCell.propTypes = {
-  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-  children: PropTypes.node.isRequired,
-  sorted: PropTypes.oneOf([false, "none", "asce", "desc"]),
-  align: PropTypes.oneOf(["left", "right", "center"]),
-};
-
-export default DataTableHeadCell;
+export default ScheduleTable;
