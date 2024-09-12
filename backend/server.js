@@ -53,7 +53,7 @@ app.get("/api/counts", (req, res) => {
     { table: "trainers", key: "trainers" },
     { table: "students", key: "students" },
     { table: "users", key: "users" },
-    { table: "classroom", key: "classrooms" },
+    { table: "classrooms", key: "classrooms" },
   ];
 
   let completedQueries = 0;
@@ -86,7 +86,7 @@ app.use("/api/roles", roleMiddleware([4]), rolesRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/trainers", trainerRoutes);
 app.use("/api/certificates", certificateRoutes);
-app.use("/api/classroom", classroomRoutes);
+app.use("/api/classrooms", classroomRoutes);
 app.use("/api/schedule", scheduleRoutes);
 app.use("/api/students", studentsRoutes);
 app.use("/api/categories", categoriesRoutes);
@@ -94,7 +94,7 @@ app.use("/api/city", cityRoutes);
 app.use("/api/assignment", assignmentRoutes);
 app.use("/api/counts", countRoutes);
 app.use("/api/exam", examRoutes);
-app.use('/api/schoolarships', scholarshipRoutes);
+app.use("/api/schoolarships", scholarshipRoutes);
 
 // Home route (This seems redundant; you may want to remove one)
 app.get("/", (req, res) => {

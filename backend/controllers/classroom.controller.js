@@ -4,13 +4,7 @@ const Classroom = require("../models/classroom.model.js");
 async function createClassroom(req, res) {
   try {
     const { classroomName, location, capacity } = req.body;
-
-    const classroom = await Classroom.create({
-      classroomName,
-      location,
-      capacity,
-    });
-
+    const classroom = await Classroom.create({ classroomName, location, capacity });
     res.status(201).json(classroom);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -49,15 +43,18 @@ exports.getClassroomById = getClassroomById;
 async function updateClassroom(req, res) {
   const id = req.params.id;
   try {
-    const [updatedRowsCount, updatedRows] = await Classroom.update(req.body, {
-      where: { id },
-      returning: true,
-    });
-    if (updatedRowsCount === 0) {
-      res.status(404).json({ message: `Classroom with id ${id} not found` });
-    } else {
-      res.status(200).json(updatedRows[0]);
+    const classroom = await Classroom.findByPk(id);
+    if (!classroom) {
+      return res.status(404).json({ message: `Classroom with id ${id} not found` });
     }
+
+    classroom.classroomName = req.body.classroomName || classroom.classroomName;
+    classroom.location = req.body.location || classroom.location;
+    classroom.capacity = req.body.capacity || classroom.capacity;
+
+    await classroom.save();
+    
+    res.status(200).json(classroom);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

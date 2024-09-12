@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -11,22 +11,23 @@ import brandWhite from "assets/images/logo-ct.png";
 import brandDark from "assets/images/logo-ct-dark.png";
 import Basic from "./layouts/authentication/sign-in";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Dashboard from './layouts/dashboard';
-import Users from './layouts/users';
-import Roles from './layouts/roles';
-import Categories from './layouts/categories';
-import Certificates from './layouts/certificates';
-import City from './layouts/city';
-import Courses from './layouts/courses';
-import Students from './layouts/students';
-import Trainers from './layouts/trainers';
-import Assignments from './layouts/assignments';
-import Exam from './layouts/exam';
-import Scholarship from './layouts/scholarships';
-import Unauthorized from './layouts/Unauthorized/index.js'; 
+import Dashboard from "./layouts/dashboard";
+import Users from "./layouts/users";
+import Roles from "./layouts/roles";
+import Categories from "./layouts/categories";
+import Certificates from "./layouts/certificates";
+import City from "./layouts/city";
+import Courses from "./layouts/courses";
+import Students from "./layouts/students";
+import Trainers from "./layouts/trainers";
+import Assignments from "./layouts/assignments";
+import Exam from "./layouts/exam";
+import Scholarship from "./layouts/scholarships";
+import Classroom from "./layouts/classrooms";
+import Unauthorized from "./layouts/Unauthorized/index.js";
 import { AuthProvider } from "./context/AuthContext";
 // import { useAuth } from './context/AuthContext';
-import axios from 'axios';
+import axios from "axios";
 
 export default function App() {
   const [controller, dispatch] = useMaterialUIController();
@@ -54,16 +55,15 @@ export default function App() {
       setMiniSidenav(dispatch, true);
       setOnMouseEnter(false);
     }
-  }
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      console.log('Axios default headers set:', axios.defaults.headers.common); // Debug log
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      console.log("Axios default headers set:", axios.defaults.headers.common); // Debug log
     }
   }, []);
-  
 
   useEffect(() => {
     document.body.setAttribute("dir", direction);
@@ -91,21 +91,114 @@ export default function App() {
         )}
         <Routes>
           <Route path="/login" element={<Basic />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/users" element={<ProtectedRoute requiredRole={4}><Users /></ProtectedRoute>} />
-          <Route path="/roles" element={<ProtectedRoute requiredRole={4}><Roles /></ProtectedRoute>} />
-          <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
-          <Route path="/categories" element={<ProtectedRoute><Categories /></ProtectedRoute>} />
-          <Route path="/certificates" element={<ProtectedRoute><Certificates /></ProtectedRoute>} />
-          <Route path="/trainers" element={<ProtectedRoute><Trainers /></ProtectedRoute>} />
-          <Route path="/students" element={<ProtectedRoute><Students /></ProtectedRoute>} />
-          <Route path="/city" element={<ProtectedRoute><City /></ProtectedRoute>} />
-          <Route path="/assignments" element={<ProtectedRoute><Assignments /></ProtectedRoute>} />
-          <Route path="/exam" element={<ProtectedRoute><Exam/></ProtectedRoute>}/>
-          <Route path="/scholarship" element={<ProtectedRoute><Scholarship/></ProtectedRoute>}/>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute requiredRole={4}>
+                <Users />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/roles"
+            element={
+              <ProtectedRoute requiredRole={4}>
+                <Roles />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoute>
+                <Courses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/categories"
+            element={
+              <ProtectedRoute>
+                <Categories />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/certificates"
+            element={
+              <ProtectedRoute>
+                <Certificates />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/trainers"
+            element={
+              <ProtectedRoute>
+                <Trainers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/students"
+            element={
+              <ProtectedRoute>
+                <Students />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/city"
+            element={
+              <ProtectedRoute>
+                <City />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assignments"
+            element={
+              <ProtectedRoute>
+                <Assignments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/exam"
+            element={
+              <ProtectedRoute>
+                <Exam />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/scholarship"
+            element={
+              <ProtectedRoute>
+                <Scholarship />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/classroom"
+            element={
+              <ProtectedRoute>
+                <Classroom />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/unauthorized" element={<Unauthorized />} /> {/* Add this route */}
           <Route path="/" element={<Navigate to="/dashboard" />} />
-          <Route path="*" element={<Navigate to="/login" />} /> {/* Redirect to login for any unknown routes */}
+          <Route path="*" element={<Navigate to="/login" />} />{" "}
+          {/* Redirect to login for any unknown routes */}
         </Routes>
       </AuthProvider>
     </ThemeProvider>
