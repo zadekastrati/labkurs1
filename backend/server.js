@@ -96,7 +96,7 @@ app.use("/api/assignment", assignmentRoutes);
 app.use("/api/counts", countRoutes);
 app.use("/api/exam", examRoutes);
 app.use('/api/schoolarships', scholarshipRoutes);
-app.use('/api/examResults', examResults);
+app.use('/api/examResult', examResultsRoutes);
 
 // Home route (This seems redundant; you may want to remove one)
 app.get("/", (req, res) => {

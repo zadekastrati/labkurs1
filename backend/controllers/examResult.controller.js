@@ -6,20 +6,24 @@ async function createExamResult(req, res) {
   console.log(req.body);
   const { score, studentId, examId } = req.body;
   if (!score || !studentId || !examId) {
-    return res.status(400).json({ message: 'All fields (score, studentId, examId) are required.' });
+    return res
+      .status(400)
+      .json({ message: "All fields (score, studentId, examId) are required." });
   }
 
   try {
     // Check if the examId exists in the exams table
     const exam = await Exam.findByPk(examId);
     if (!exam) {
-      return res.status(400).json({ message: 'Invalid examId' });
+      return res.status(400).json({ message: "Invalid examId" });
     }
 
     const examResult = await ExamResult.create({ score, studentId, examId });
     res.status(201).json(examResult);
   } catch (err) {
-    res.status(500).json({ message: `Error creating exam result: ${err.message}` });
+    res
+      .status(500)
+      .json({ message: `Error creating exam result: ${err.message}` });
   }
 }
 exports.createExamResult = createExamResult;
@@ -28,7 +32,7 @@ exports.createExamResult = createExamResult;
 async function getAllExamResults(req, res) {
   try {
     const examResults = await ExamResult.findAll({
-      include: Exam
+      include: Exam,
     });
     res.status(200).json(examResults);
   } catch (err) {
@@ -42,7 +46,7 @@ async function getExamResultById(req, res) {
   const id = req.params.id;
   try {
     const examResult = await ExamResult.findByPk(id, {
-      include: Exam
+      include: Exam,
     });
     if (!examResult) {
       res.status(404).json({ message: `Exam result with id ${id} not found.` });
@@ -50,7 +54,9 @@ async function getExamResultById(req, res) {
       res.status(200).json(examResult);
     }
   } catch (err) {
-    res.status(500).json({ message: `Error finding exam result: ${err.message}` });
+    res
+      .status(500)
+      .json({ message: `Error finding exam result: ${err.message}` });
   }
 }
 exports.getExamResultById = getExamResultById;
