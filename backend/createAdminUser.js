@@ -1,4 +1,3 @@
-// createAdminUser.js
 const { db } = require("./config/db.config"); // Adjust the path as needed
 const User = require("./models/user.model");
 const Role = require("./models/roles.model");
@@ -19,10 +18,10 @@ async function createAdminUser() {
 
     // Create the admin user
     const adminUser = await User.create({
-      name: "Blerina Krasniqi",
-      email: "blerina.krasniqi@gmail.com",
+      name: 'Leonita Bunjaku',
+      email: 'leonita.bunjaku@gmail.com', // Use a different email address
       roleId: adminRole.id,
-      password: "blerina1234.", // This will be hashed automatically by the model hooks
+      password: 'Leonita123.', // This will be hashed automatically by the model hooks
     });
 
     console.log("Admin user created successfully:", adminUser);
@@ -34,10 +33,11 @@ async function createAdminUser() {
       await db.close();
       console.log("Database connection closed.");
     } catch (error) {
-      console.error("Error closing the database connection:", error);
+      console.error('Error closing the database connection:', error);
     }
   }
 }
 
-// Run the function to create the admin user
+// Call the function
 createAdminUser();
+
