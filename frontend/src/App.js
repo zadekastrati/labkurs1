@@ -24,6 +24,7 @@ import Assignments from "./layouts/assignments";
 import Exam from "./layouts/exam";
 import Scholarship from "./layouts/scholarships";
 import Classroom from "./layouts/classrooms";
+import Schedule from "./layouts/schedules";
 import Unauthorized from "./layouts/Unauthorized/index.js";
 import { AuthProvider } from "./context/AuthContext";
 // import { useAuth } from './context/AuthContext';
@@ -192,6 +193,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Classroom />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/schedule"
+            element={
+              <ProtectedRoute>
+                <Schedule />
               </ProtectedRoute>
             }
           />

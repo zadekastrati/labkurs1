@@ -12,6 +12,7 @@ import City from "layouts/city";
 import Assignments from "layouts/assignments";
 import Exam from "layouts/exam";
 import Classroom from "layouts/classrooms";
+import Schedule from "layouts/schedules";
 // @mui icons
 import Icon from "@mui/material/Icon";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,8 +25,10 @@ import {
   faSchool,
   faSwatchbook,
   faSchoolCircleCheck,
+  faCalendar,
 } from "@fortawesome/free-solid-svg-icons";
 import { fabClasses } from "@mui/material";
+import ScheduleForm from "layouts/schedules/form";
 
 const routes = [
   {
@@ -124,6 +127,14 @@ const routes = [
     icon: <FontAwesomeIcon icon={faSchool} />,
     route: "/classroom",
     component: <Classroom />,
+  },
+  {
+    type: "collapse",
+    name: "Schedule",
+    key: "schedule",
+    icon: <FontAwesomeIcon icon={faCalendar} />,
+    route: "/schedule",
+    component: <Schedule />,
   },
 ];
 

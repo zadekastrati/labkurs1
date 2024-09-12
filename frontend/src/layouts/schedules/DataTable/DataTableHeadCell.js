@@ -1,4 +1,4 @@
-// ScheduleTable.js
+// DataTableHeadCell.js
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
@@ -7,7 +7,7 @@ import DataTableBodyCell from './DataTableBodyCell';
 import DataTableHeadCell from './DataTableHeadCell';
 import axios from 'axios'; // For making HTTP requests
 
-function ScheduleTable({ schedules, onEdit, onDelete }) {
+function DataTableHeadCell({ schedules, onEdit, onDelete }) {
   const [sortedColumn, setSortedColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState("none");
 
@@ -89,10 +89,10 @@ function ScheduleTable({ schedules, onEdit, onDelete }) {
   );
 }
 
-ScheduleTable.propTypes = {
+DataTableHeadCell.propTypes = {
   schedules: PropTypes.array.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };
 
-export default ScheduleTable;
+export default DataTableHeadCell;

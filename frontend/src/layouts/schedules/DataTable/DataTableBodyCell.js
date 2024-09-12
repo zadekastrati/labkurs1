@@ -1,10 +1,11 @@
-// ScheduleForm.js
+// DataTableBodyCell.js
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { TextField, Button, Grid, MenuItem, FormControl, InputLabel, Select } from '@mui/material';
 import axios from 'axios';
+import DataTableBodyCell from 'examples/Tables/DataTable/DataTableBodyCell';
 
-function ScheduleForm({ schedule, onSubmit, onCancel }) {
+function DataTableBodyCell({ schedule, onSubmit, onCancel }) {
   const [formData, setFormData] = useState({
     scheduleName: '',
     classroomId: '',
@@ -97,10 +98,10 @@ function ScheduleForm({ schedule, onSubmit, onCancel }) {
   );
 }
 
-ScheduleForm.propTypes = {
+DataTableBodyCell.propTypes = {
   schedule: PropTypes.object,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
 };
 
-export default ScheduleForm;
+export default DataTableBodyCell;
