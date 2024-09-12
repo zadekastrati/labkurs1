@@ -49,3 +49,4 @@ const Schedule = db.define("Schedule", {
 Schedule.belongsTo(Classroom, { foreignKey: "classroomId" });
 
 module.exports = Schedule;
+
