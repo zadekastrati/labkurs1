@@ -17,24 +17,24 @@ import MDTypography from "components/MDTypography";
 import DashboardLayout from "examples/LayoutContainers/DashboardLayout";
 import DashboardNavbar from "examples/Navbars/DashboardNavbar";
 import Footer from "examples/Footer";
-import DataTable from "layouts/certificates/DataTable";
-import CertificateForm from "layouts/certificates/form";
+import DataTable from "layouts/schedules/DataTable"; // Adjust the path if needed
+import ScheduleForm from "layouts/schedules/form"; // Adjust the path if needed
 import { useAuth } from "../../context/AuthContext";
 
-function Certificates() {
+function Schedules() {
   const { user } = useAuth();
-  const [certificateData, setCertificateData] = useState([]);
+  const [scheduleData, setScheduleData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
-  const [deleteCertificateId, setDeleteCertificateId] = useState(null);
+  const [deleteScheduleId, setDeleteScheduleId] = useState(null);
   const [openCreateModal, setOpenCreateModal] = useState(false);
   const [openUpdateModal, setOpenUpdateModal] = useState(false);
-  const [selectedCertificate, setSelectedCertificate] = useState(null);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
 
   const fetchData = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/certificates", {
+      const response = await fetch("http://localhost:8080/api/schedules", {
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
         }
@@ -43,15 +43,14 @@ function Certificates() {
       const data = await response.json();
       const formattedData = data.map((item) => ({
         id: item.id,
-        certificate: <Author studentsName={item.studentsName} courseType={item.courseType} />,
-        trainer: (
-          <MDBox ml={2}>
-            <MDBadge
-              badgeContent={item.Trainer.trainersName}
-              color="info"
-              variant="gradient"
-              size="sm"
-            />
+        schedule: (
+          <MDBox display="flex" alignItems="center" lineHeight={1}>
+            <MDBox lineHeight={1}>
+              <MDTypography display="block" variant="button" fontWeight="medium">
+                {item.scheduleName}
+              </MDTypography>
+              <MDTypography variant="caption">{item.scheduleDetails}</MDTypography>
+            </MDBox>
           </MDBox>
         ),
         action: (
@@ -75,7 +74,7 @@ function Certificates() {
           </MDBox>
         ),
       }));
-      setCertificateData(formattedData);
+      setScheduleData(formattedData);
     } catch (error) {
       setError(error);
     } finally {
@@ -87,65 +86,77 @@ function Certificates() {
     fetchData();
   }, []);
 
-  const handleOpenDeleteModal = (certificateId) => {
-    setDeleteCertificateId(certificateId);
+  const handleOpenDeleteModal = (scheduleId) => {
+    setDeleteScheduleId(scheduleId);
     setOpenDeleteModal(true);
   };
 
   const handleCloseDeleteModal = () => setOpenDeleteModal(false);
 
-  const handleDeleteCertificate = async (certificateId) => {
+  const handleDeleteSchedule = async (scheduleId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/certificates/${certificateId}`, {
+      const response = await fetch(`http://localhost:8080/api/schedules/${scheduleId}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
         }
       });
-      if (!response.ok) throw new Error("Failed to delete certificate");
-      setCertificateData((prevData) => prevData.filter((item) => item.id !== certificateId));
+      if (!response.ok) throw new Error("Failed to delete schedule");
+      setScheduleData((prevData) => prevData.filter((item) => item.id !== scheduleId));
       handleCloseDeleteModal();
     } catch (error) {
-      console.error("Error deleting certificate:", error);
+      console.error("Error deleting schedule:", error);
     }
   };
 
   const handleOpenCreateModal = () => setOpenCreateModal(true);
   const handleCloseCreateModal = () => setOpenCreateModal(false);
 
-  const handleCreateCertificate = async (certificateData) => {
-    console.log("Create certificate data:", certificateData);
-    handleCloseCreateModal();
-    fetchData();
+  const handleCreateSchedule = async (scheduleData) => {
+    try {
+      const response = await fetch("http://localhost:8080/api/schedules", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        },
+        body: JSON.stringify(scheduleData),
+      });
+      if (!response.ok) throw new Error("Failed to create schedule");
+      handleCloseCreateModal();
+      fetchData();
+    } catch (error) {
+      console.error("Error creating schedule:", error);
+    }
   };
 
-  const handleOpenUpdateModal = (certificate) => {
-    setSelectedCertificate(certificate);
+  const handleOpenUpdateModal = (schedule) => {
+    setSelectedSchedule(schedule);
     setOpenUpdateModal(true);
   };
 
   const handleCloseUpdateModal = () => setOpenUpdateModal(false);
 
-  const handleUpdateCertificate = async (certificateId, certificateData) => {
-    console.log("Update certificate data:", certificateData);
-    handleCloseUpdateModal();
-    fetchData();
+  const handleUpdateSchedule = async (scheduleId, scheduleData) => {
+    try {
+      const response = await fetch(`http://localhost:8080/api/schedules/${scheduleId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem('jwtToken')}`
+        },
+        body: JSON.stringify(scheduleData),
+      });
+      if (!response.ok) throw new Error("Failed to update schedule");
+      handleCloseUpdateModal();
+      fetchData();
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+    }
   };
 
-  const Author = ({ studentsName, courseType }) => (
-    <MDBox display="flex" alignItems="center" lineHeight={1}>
-      <MDBox lineHeight={1}>
-        <MDTypography display="block" variant="button" fontWeight="medium">
-          {studentsName}
-        </MDTypography>
-        <MDTypography variant="caption">{courseType}</MDTypography>
-      </MDBox>
-    </MDBox>
-  );
-
   const columns = [
-    { Header: "Certificate", accessor: "certificate", width: "45%", align: "left" },
-    { Header: "Trainer", accessor: "trainer", align: "left" },
+    { Header: "Schedule", accessor: "schedule", width: "80%", align: "left" },
     { Header: "Action", accessor: "action", align: "right" },
   ];
 
@@ -172,7 +183,7 @@ function Certificates() {
                 coloredShadow="info"
               >
                 <MDTypography variant="h6" color="white">
-                  Certificates
+                  Schedules
                 </MDTypography>
               </MDBox>
               <MDBox pt={3}>
@@ -182,7 +193,7 @@ function Certificates() {
                   <MDTypography>Error: {error.message}</MDTypography>
                 ) : (
                   <DataTable
-                    table={{ columns, rows: certificateData }}
+                    table={{ columns, rows: scheduleData }}
                     isSorted={false}
                     entriesPerPage={false}
                     showTotalEntries={false}
@@ -199,12 +210,12 @@ function Certificates() {
       {/* Delete Confirmation Modal */}
       <Dialog open={openDeleteModal} onClose={handleCloseDeleteModal}>
         <DialogContent>
-          <MDTypography>Are you sure you want to delete this certificate?</MDTypography>
+          <MDTypography>Are you sure you want to delete this schedule?</MDTypography>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDeleteModal}>Cancel</Button>
           <Button
-            onClick={() => handleDeleteCertificate(deleteCertificateId)}
+            onClick={() => handleDeleteSchedule(deleteScheduleId)}
             color="primary"
             style={{ color: "#ff0000" }}
           >
@@ -213,24 +224,24 @@ function Certificates() {
         </DialogActions>
       </Dialog>
 
-      {/* Create Certificate Modal */}
-      <CertificateForm
+      {/* Create Schedule Modal */}
+      <ScheduleForm
         open={openCreateModal}
         handleClose={handleCloseCreateModal}
-        onSubmit={handleCreateCertificate}
+        onSubmit={handleCreateSchedule}
       />
 
-      {/* Update Certificate Modal */}
-      <CertificateForm
+      {/* Update Schedule Modal */}
+      <ScheduleForm
         open={openUpdateModal}
         handleClose={handleCloseUpdateModal}
-        onSubmit={(certificateData) =>
-          handleUpdateCertificate(selectedCertificate.id, certificateData)
+        onSubmit={(scheduleData) =>
+          handleUpdateSchedule(selectedSchedule.id, scheduleData)
         }
-        initialData={selectedCertificate}
+        initialData={selectedSchedule}
       />
     </DashboardLayout>
   );
 }
 
-export default Certificates;
+export default Schedules;
